@@ -1,0 +1,3 @@
+lua>5.1
+luasjit>2.0
+pycco>0.5
