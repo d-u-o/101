@@ -3,7 +3,7 @@ filetype plugin indent on
 set autoindent
 set background=light
 set backspace=indent,eol,start
-set backupdir^=$Tmp
+set backupdir^=/Users/timm/gits/d-u-o/101/src/tmp
 set ignorecase
 set incsearch
 set laststatus=2

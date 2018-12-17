@@ -1,22 +1,25 @@
-#!/usr/bin/env bash
-
-[ -f ".config" ] && . .config
-
-What=${What:-D-U-O}
-
-Lua=${Lua:-luajit}
-
-reload() {
-          . ../etc/.bashrc
-	}
-
+reload() { 
+	. $Tmp/.bashrc; 
+}
+zap() {
+  	rm -rf $Tmp/*
+  	reload
+}
 pathadd() {
     	if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
         	PATH="${PATH:+"$PATH:"}$1"
     	fi
 }
+pathadd $Bin
 
-pathadd $PWD
+ok() {
+  (cd ../test; $Lua $1.lua)
+}
+
+htmls() {
+  cd ../src
+  pycco -i -d ../docs *.lua
+}
 
 #--- tag line stuff
 _c1="\[\033[01;32m\]"
@@ -31,17 +34,5 @@ here() { cd $1; basename "$PWD"; }
 
 PROMPT_COMMAND='echo -ne "${_c6}${What}> \033]0;$(here ../..)/$(here ..)/$(here .)\007";PS1="${_c1}$(here ../..)/$_c2$(here ..)/$_c3$(here .) ${_c6}\!>${_c0}\e[m "'
 
-alias ls="`which ls` -GF"
-alias vi="`which vim` -u ../etc/dotvimrc "
-
-
-ok() {
-  (cd ../test; $Lua $1.lua)
-}
-
-htmls() {  
-  cd ../src
-  pycco -i -d ../docs *.lua
-}
-
-
+alias ll='ls -GF'
+alias vi="`which vim` -u $Tmp/.vimrc "

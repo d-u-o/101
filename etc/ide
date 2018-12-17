@@ -1,3 +1,44 @@
 #!/usr/bin/env bash
 
-bash --init-file ../etc/dotbashrc -i
+What=${What:-Duo101}
+Who=${Who:-Tim Menzies}
+When=${When:-2018}
+Repo=${Repo:-d-u-o/101}
+
+##############################################
+
+Ide=${Ide:-$PWD}
+Tmp=${Tmp:-$Ide/tmp}
+Bin=${Bin:-$Ide/tmp/bin}
+Etc=${Etc:-$Ide/etc}
+Test=${Test:-$Ide/test}
+
+dirs()      { mkdir -p "$Tmp" "$Bin" "$Etc" "$Test"; }
+exe()       { chmod +x "$Etc"/*.sh;  }
+gitignore() { cat "$Etc"/dotignore;  }
+reqires()   { . "$Etc"/requires.txt; }
+citation()  { . "$Etc"/citation.sh;  }
+license()   { . "$Etc"/license.sh;   }
+vimrc()     { cat "$Etc"/dotvimrc;   }
+bashrc()    { cat "$Etc"/dotbashrc;  }
+
+exists0() {
+  	if [ ! -f "$1" ]; then $2 > "$1"; fi
+}
+exists() {
+	exists0 "$1" $2
+	git add "$1"
+}
+dirs
+exe
+exists  ../.gitignore    	gitignore
+exists  ../requirements.txt 	requires
+exists  ../CITATION.md 		citation
+exists  ../LICENSE.md 		license
+exists0 "$Tmp"/.vimrc        	vimrc
+exists0 "$Tmp"/.bashrc 		bashrc
+
+Bin="$Bin" Here="$Here" What="$What" \
+Who="$Who" When="$When" Repo="$Repo" \
+Ide="$Ide" Tmp="$Tmp"   Etc="$Etc" Test="$Test"\
+bash --init-file "$Tmp"/.bashrc -i
