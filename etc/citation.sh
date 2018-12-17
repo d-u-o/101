@@ -1,3 +1,4 @@
+cat<<EOF
 # CITATION
 
 Please cite this as
@@ -12,4 +13,4 @@ Bibtex:
       title="$What",
       note="Download from http://github.com/$Repo"
     }
-
+EOF

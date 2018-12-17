@@ -1,3 +1,2 @@
-lua>5.1
-luasjit>2.0
-pycco>0.5
+lua>=5.2
+luajit>=5.2

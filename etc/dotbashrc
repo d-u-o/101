@@ -3,7 +3,8 @@ reload() {
 }
 zap() {
   	rm -rf $Tmp/*
-  	reload
+	cp $Etc/dotbashrc $Tmp
+	reload
 }
 pathadd() {
     	if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
@@ -20,7 +21,13 @@ htmls() {
   cd ../src
   pycco -i -d ../docs *.lua
 }
-
+push() {
+	git commit -am saving
+	git push
+}
+pull() {
+	git pull
+}
 #--- tag line stuff
 _c1="\[\033[01;32m\]"
 _c2="\[\033[01;34m\]"
