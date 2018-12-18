@@ -1,44 +1,56 @@
 #!/usr/bin/env bash
 
+#### begin config
 What=${What:-Duo101}
 Who=${Who:-Tim Menzies}
 When=${When:-2018}
 Repo=${Repo:-d-u-o/101}
+#### end config
 
 ##############################################
+trap cleanup  0 1 2 3 6
 
-Ide=${Ide:-..}
-Tmp=${Tmp:-$Ide/tmp}
-Bin=${Bin:-$Ide/bin}
-Etc=${Etc:-$Ide/etc}
-Test=${Test:-$Ide/test}
+Tmp=${Tmp:-/tmp/$USER/ide/$$.$RANDOM}
+Ide=${Ide:-$(dirname $PWD)}
+Bin=${Bin:-"$Tmp"/bin}
+Etc=${Etc:-"$Ide"/etc}
+Src=${Src:-"$Ide"/src}
+Doc=${Doc:-"$Ide"/docs}
+Test=${Test:-"$Ide"/test}
 
-dirs()      { mkdir -p "$Tmp" "$Bin" "$Etc" "$Test"; }
-exe()       { chmod +x "$Etc"/*.sh;    }
-gitignore() { cat "$Etc"/dotgitignore; }
-requires()  { cat "$Etc"/requires.txt; }
-citation()  { . "$Etc"/citation.sh;    }
-license()   { . "$Etc"/license.sh;     }
-vimrc()     { cat "$Etc"/dotvimrc;     }
 bashrc()    { cat "$Etc"/dotbashrc;    }
+citation()  { . "$Etc"/citation.sh;    }
+cleanup()   { rm -rf  "$Tmp";          }
+exe()       { chmod +x "$Etc"/*.sh;    }
+exists()    { exists0 "$1" $2; git add "$1"; }
+exists0()   { if [ ! -f "$1" ]; then $2 > "$1"; fi; }
+gitignore() { cat "$Etc"/dotgitignore; }
+license()   { . "$Etc"/license.sh;     }
+makedirs()  { mkdir -p "$Src" "$Tmp" "$Bin" "$Etc" "$Test" "$Doc"; }
+requires()  { cat "$Etc"/requires.txt; }
+vimrc()     { . "$Etc"/dotvimrc.sh;    }
 
-exists0() {
-  	if [ ! -f "$1" ]; then $2 > "$1"; fi
-}
-exists() {
-	exists0 "$1" $2
-	git add "$1"
-}
-dirs
+for i in pycco lua luajit; do
+	if [ ! `which $i` ]; then
+		echo "Aborting. $i is missing."
+		exit 1
+	fi
+done
+
+Lua=$(which lua)
+
+makedirs
 exe
-exists  ../.gitignore    	gitignore
-exists  ../requirements.txt 	requires
-exists  ../CITATION.md 		citation
-exists  ../LICENSE.md 		license
-exists0 "$Tmp"/.vimrc        	vimrc
-exists0 "$Tmp"/.bashrc 		bashrc
+exists  "$Ide"/.gitignore       gitignore
+exists  "$Ide"/requirements.txt requires
+exists  "$Ide"/CITATION.md      citation
+exists  "$Ide"/LICENSE.md       license
+exists0 "$Tmp"/.vimrc           vimrc
+exists0 "$Tmp"/.bashrc          bashrc
 
-Bin="$Bin" Here="$Here" What="$What" \
-Who="$Who" When="$When" Repo="$Repo" \
-Ide="$Ide" Tmp="$Tmp"   Etc="$Etc" Test="$Test" \
+
+Bin="$Bin" Here="$Here" What="$What" Lua="$Lua" \
+Who="$Who" When="$When" Repo="$Repo" Doc="$Doc" \
+Ide="$Ide" Tmp="$Tmp"   Etc="$Etc"   Test="$Test" \
+Src="$Src" \
 bash --init-file "$Tmp"/.bashrc -i

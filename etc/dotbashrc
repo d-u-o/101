@@ -1,11 +1,5 @@
-reload() { 
-	. $Tmp/.bashrc; 
-}
-zap() {
-  	rm -rf $Tmp/*
-	cp $Etc/dotbashrc $Tmp
-	reload
-}
+#!/usr/bin/env bash
+
 pathadd() {
     	if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
         	PATH="${PATH:+"$PATH:"}$1"
@@ -44,3 +38,5 @@ PROMPT_COMMAND='echo -ne "${_c6}${What}> \033]0;$(here ../..)/$(here ..)/$(here 
 
 alias ll='ls -GF'
 alias vi="`which vim` -u $Tmp/.vimrc "
+
+cd $Src

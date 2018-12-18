@@ -1,9 +1,10 @@
+cat <<EOF
 autocmd BufEnter * silent! lcd %:p:h
 filetype plugin indent on
 set autoindent
 set background=light
 set backspace=indent,eol,start
-set backupdir^=/Users/timm/gits/d-u-o/101/src/tmp
+set backupdir^=$Tmp
 set ignorecase
 set incsearch
 set laststatus=2
@@ -20,7 +21,9 @@ set splitbelow
 set syntax=on
 set title
 set visualbell
+set number
 syntax enable
 set fillchars+=vert:\ 
 colorscheme torte
 hi VertSplit guifg=#202020 guibg=#202020 gui=NONE ctermfg=DarkGray ctermbg=DarkGray cterm=NONE
+EOF

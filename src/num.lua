@@ -1,7 +1,6 @@
 --vim: ts=2 sw=2 sts=2 expandtab:cindent:formatoptions+=cro 
 --------- --------- --------- --------- --------- --------- 
 
-require "sample"
 
 -- ## Example
 
@@ -11,15 +10,13 @@ require "sample"
 --                333,350,375,443,475,525,583,780,1000}
 --      print(n.mu, n.sd) ==> 270.3, 231.946
 --    
-
 -- Inside a `num`:
-
-function num(max)  
-  return {n=0, mu=0, m2=0, sd=0, 
-          lo=10^32, hi=-1*10^32, _some=sample(max),
-          w=1}
+function num(txt)  
+    return {n=0, mu=0, m2=0, sd=0, id = id(), 
+            lo=10^32, hi=-1*10^32, txt=txt,
+            w=1}
 end
-
+--
 -- Bulk add to a `num`:
 
 function nums(t,f,      n)
@@ -35,7 +32,6 @@ end
 function numInc(t,x,    d) 
   if x == "?" then return x end
   t.n  = t.n + 1
-  sampleInc(t._some, x)
   d    = x - t.mu
   t.mu = t.mu + d/t.n
   t.m2 = t.m2 + d*(x - t.mu)
@@ -89,10 +85,6 @@ function numPdf(t,x)
          1 / (t.sd * ((2*math.pi)^0.5))
 end
 
-
--- Medians
-
-function numMedian(t) return nth(t._some, .5) end
 
 -- Misc
 

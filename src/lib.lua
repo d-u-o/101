@@ -4,6 +4,14 @@
 require "config"
 
 --------- --------- --------- --------- --------- --------- 
+-- ## Unique ids
+
+do
+	local n= 0
+	function id() n=n+1; return n end
+end
+
+--------- --------- --------- --------- --------- --------- 
 -- ## String Stuff
 
 function split(s, sep,    t,notsep)
@@ -52,7 +60,6 @@ cat = table.concat
 function dump(a,sep)
   for i=1,#a do print(cat(a[i],sep or ",")) end
 end
-
 
 function first(t)  return t[ 1] end
 function second(t) return t[ 2] end

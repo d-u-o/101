@@ -178,7 +178,8 @@ function rows1(stream, t,f0,f,   first,line,cells)
 end
 
 function rows(file,t,f0,f,      stream,txt,cells,r,line)
-  return rows1( file and io.input(file) or io.input(),
+  return rows1( file and io.input(file) -- reading from some specified file
+                      or io.input(),    -- reading from standard input
                 t  or data(), f0 or header, f or row) end 
 
 -- ## Making `data` from Ram 
