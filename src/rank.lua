@@ -29,28 +29,33 @@ require "rows"
 -- so the only thing to do when it terminates is
 -- dump the new table and quit.
 
-function best(data,goal,enough,       
-              rows,doms,label)
-  rows   = data.rows
-  label  = label or #(rows[1]) 
-  goal   = goal  or label - 1
-
-  local function best1(  seen,all,tmp)
-	  seen,all={},{}
-	  for _,row in pairs(data.rows)  do
-	    local label1= row[label]
-	    local goal1 = row[goal]
-	    if not seen[label1] then
-	      all[#all+1]  = num(label1)
-	      seen[label1] = #all 
-	    end
-	    local tmp =  all[ seen[label1] ]
-	    numInc(tmp, goal1)
-	  end
-	  return ksort("mu",all)[#all]
+function rank(data,goal,enough,       
+              rows,doms,label,seen)
+  rows  = data.rows
+  label = label or #(rows[1]) 
+  goal  = goal  or label - 1
+  seen,all={},{}
+  for _,c in pairs(data.indeps) do
+    for r=1,#rows do
+      local v = rows[r][c]
+      local this = c .. "=" .. v
+      if not seen[this] then
+        n = num(this)
+        n.c= c
+        n.v= v
+        all[#all+1] = n
+        seen[this] = #all
+      end
+      local tmp= all[ seen[this] ]
+      numInc(tmp, rows[r][goal])
+    end
+  end
+  all=ksort("mu",all)       
+  for i,one in pairs(all) do
+    print(i,one.c, one.v, one.mu)
   end
 end
 
 -- Main function, if this is called top-level.
 
-return {main=function() return best(rows()) end}
+return {main=function() return rank(rows()) end}

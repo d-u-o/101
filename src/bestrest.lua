@@ -36,18 +36,19 @@ function label(data,  enough,rows, most,cohen)
     return cut
   end
 
+  local function mark(c, lo,hi,   b)
+    b= band(c,lo,hi)
+    for r=lo,hi do rows[r][c+1]=b end 
+  end
+
   local function cuts(c,lo,hi,pre,       cut,txt,b)
-    txt = pre..tostring(rows[lo][c])..".. "..tostring(rows[hi][c])
-    cut = argmin(c,lo,hi)
-    if cut then
-      fyi(txt)
-      cuts(c,lo,   cut, pre.."|.. ")
-      cuts(c,cut+1, hi, pre.."|.. ")
-    else
-      b= band(c,lo,hi)
-      fyi(txt.." ("..b..")")
-      for r=lo,hi do
-        rows[r][c+1]=b end end
+    fyi(pre .. rows[lo][c])
+    if hi - lo > enough then
+      cut = argmin(c,lo,hi,cohen)
+      if cut then
+        return cuts(c,cut+1,hi, pre.."|..") end end
+    mark(c,1,lo-1)
+    mark(c,lo,hi)
   end
 
   local c=#data.name
