@@ -46,7 +46,7 @@ require "sym"
 
 function data()
   return {w={}, syms={}, nums={}, class=nil, 
-          rows={}, name= {}, _use={}} 
+          rows={}, name= {}, col={}, _use={}} 
 end
 
 -- Columns can be `indep`endent or `dep`endent (and the goal
@@ -75,6 +75,7 @@ function header(cells,t,       c,w)
       c = #t._use+1
       t._use[c] = c0
       t.name[c] = x
+      t.col[x]  = c
       if x:match("[<>%$]") 
 	 then t.nums[c] = num() 
 	 else t.syms[c] = sym() 

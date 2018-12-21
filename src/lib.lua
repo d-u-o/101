@@ -75,12 +75,13 @@ function splice(t,m,n,f,    u)
   return u
 end
 
-function ksort(k,t,  f) 
+function ksort(k,t, reverse,  f) 
+  reverse = reverse and reverse or false
   f=function(x,y)
        x,y=x[k], y[k]
        if     x=="?" then return false
        elseif y=="?" then return true
-      else return x < y end end
+      else return x<y end end
   table.sort(t,f)
   return t
 end  

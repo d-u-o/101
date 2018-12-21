@@ -31,6 +31,7 @@ require "rows"
 
 function rank(data,goal,enough,       
               rows,doms,label,seen)
+  
   rows  = data.rows
   label = label or #(rows[1]) 
   goal  = goal  or label - 1
@@ -56,6 +57,52 @@ function rank(data,goal,enough,
   end
 end
 
+local function  main (file,   blank,all) 
+  all={}
+  everything = rows(file and io.input(file) or io.input(),
+       data(),
+       header, 
+       function(t,cells,  k)
+         blank = blank or clone(t)
+         k     = cells[#cells]
+         all[k] = all[k] or clone(blank)
+         row(t,cells)
+         row(all[k],cells) end)
+  goal,most = nil,-1
+  best,rest,order = {},{},{}
+  for k,t in pairs(all) do -- initialize the best rest tables
+    best[k], rest[k] = {},{}
+    tmp = t.nums[t.col['>dom']].mu
+    if tmp > most then most,goal = tmp,k end 
+    for c,_ in pairs(t.name) do
+      if indep(t,c) then
+        best[k][c] = {}
+        rest[k][c] = {} end end end
+  for k,t in pairs(all) do -- fill in the best,rest tables
+    what = k == goal and best or rest
+    for c,sym in pairs(t.syms) do
+      if indep(t,c) then
+        for x,count in pairs(sym.counts) do
+          what[k][c][x]  = (what[k][c][x] or 0) + count end end end end --return rank(all)
+  nb = #all[goal].rows
+  nr = #everything.rows - nb
+  print("nb",nb,"nr",nr)
+  o(best)
+  o(rest)
+  for c,_ in pairs(best[goal]) do
+    for x,b in pairs(best[goal][c]) do
+      r = rest[goal][c][x] or 0
+      print(c,x,b,r)
+      b = b/(nb + 0.00001)
+      r = r/(nr + 0.00001)
+      if b > r then
+        order[#order+1] = {b^2/(b+r), c,x} end end end
+  ksort(1,order)
+  for _,o in pairs(order) do
+    print(o[1],o[2],o[3])
+  end
+end
+
 -- Main function, if this is called top-level.
 
-return {main=function() return rank(rows()) end}
+return {main= main}
