@@ -78,6 +78,8 @@ local function  main (file,   blank,all)
       if indep(t,c) then
         best[k][c] = {}
         rest[k][c] = {} end end end
+  print(goal)
+  -- best and rest should not have k!!!!
   for k,t in pairs(all) do -- fill in the best,rest tables
     what = k == goal and best or rest
     for c,sym in pairs(t.syms) do
@@ -87,7 +89,9 @@ local function  main (file,   blank,all)
   nb = #all[goal].rows
   nr = #everything.rows - nb
   print("nb",nb,"nr",nr)
+  print("best")
   o(best)
+  print("rest")
   o(rest)
   for c,_ in pairs(best[goal]) do
     for x,b in pairs(best[goal][c]) do
