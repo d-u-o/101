@@ -28,7 +28,10 @@ exists()    { exists0 "$1" $2; git add "$1"; }
 exists0()   { if [ ! -f "$1" ]; then $2 > "$1"; fi; }
 gitignore() { cat "$Etc"/dotgitignore; }
 license()   { . "$Etc"/license.sh;     }
-makedirs()  { mkdir -p "$Src" "$Tmp" "$Bin" "$Etc" "$Test" "$Doc"; }
+makedirs()  { mkdir -p "$Src" "$Tmp" "$Bin" "$Etc" "$Test" "$Doc"; 
+	      echo .nojekyll > "$Doc"/.nojekyll 
+	      git add "$Doc"/.nojekyll
+            }
 requires()  { cat "$Etc"/requires.txt; }
 vimrc()     { . "$Etc"/dotvimrc.sh;    }
 
