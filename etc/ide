@@ -21,6 +21,8 @@ Test=${Test:-"$Ide"/test}
 bashrc()    { cat "$Etc"/dotbashrc;    }
 citation()  { . "$Etc"/citation.sh;    }
 cleanup()   { rm -rf  "$Tmp";          }
+conduct()   { cat "$Etc"/conduct.md;   }
+contrib()   { cat "$Etc"/contrib.md;   }
 exe()       { chmod +x "$Etc"/*.sh;    }
 exists()    { exists0 "$1" $2; git add "$1"; }
 exists0()   { if [ ! -f "$1" ]; then $2 > "$1"; fi; }
@@ -41,12 +43,14 @@ Lua=$(which lua)
 
 makedirs
 exe
-exists  "$Ide"/.gitignore       gitignore
-exists  "$Ide"/requirements.txt requires
-exists  "$Ide"/CITATION.md      citation
-exists  "$Ide"/LICENSE.md       license
-exists0 "$Tmp"/.vimrc           vimrc
-exists0 "$Tmp"/.bashrc          bashrc
+exists  "$Ide"/.gitignore          gitignore
+exists  "$Ide"/requirements.txt    requires
+exists  "$Ide"/CITATION.md         citation
+exists  "$Ide"/LICENSE.md          license
+exists  "$Ide"/CODE_OF_CONDUCT.md  conduct
+exists  "$Ide"/CONTRIBUTING.md     contrib
+exists0 "$Tmp"/.vimrc              vimrc
+exists0 "$Tmp"/.bashrc             bashrc
 
 
 Bin="$Bin" Here="$Here" What="$What" Lua="$Lua" \
