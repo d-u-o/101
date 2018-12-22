@@ -29,84 +29,58 @@ require "rows"
 -- so the only thing to do when it terminates is
 -- dump the new table and quit.
 
-function rank(data,goal,enough,       
-              rows,doms,label,seen)
-  
-  rows  = data.rows
-  label = label or #(rows[1]) 
-  goal  = goal  or label - 1
-  seen,all={},{}
-  for _,c in pairs(data.indeps) do
-    for r=1,#rows do
-      local v = rows[r][c]
-      local this = c .. "=" .. v
-      if not seen[this] then
-        n = num(this)
-        n.c= c
-        n.v= v
-        all[#all+1] = n
-        seen[this] = #all
-      end
-      local tmp= all[ seen[this] ]
-      numInc(tmp, rows[r][goal])
-    end
-  end
-  all=ksort("mu",all)       
-  for i,one in pairs(all) do
-    print(i,one.c, one.v, one.mu)
-  end
+
+local function klasses(file,      both,all, blank,k)
+  both={}
+  all = rows(file and io.input(file) or io.input(),
+             data(),
+             header, 
+             function(t,cells,  k)
+                blank = blank or clone(t)
+                k     = cells[#cells]
+                both[k] = both[k] or clone(blank)
+                row(t,cells)
+                row(both[k],cells) end)
+  return all, both
 end
 
-local function  main (file,   blank,all) 
-  all={}
-  everything = rows(file and io.input(file) or io.input(),
-       data(),
-       header, 
-       function(t,cells,  k)
-         blank = blank or clone(t)
-         k     = cells[#cells]
-         all[k] = all[k] or clone(blank)
-         row(t,cells)
-         row(all[k],cells) end)
-  goal,most = nil,-1
-  best,rest,order = {},{},{}
-  for k,t in pairs(all) do -- initialize the best rest tables
-    best[k], rest[k] = {},{}
-    tmp = t.nums[t.col['>dom']].mu
-    if tmp > most then most,goal = tmp,k end 
-    for c,_ in pairs(t.name) do
-      if indep(t,c) then
-        best[k][c] = {}
-        rest[k][c] = {} end end end
-  print(goal)
-  -- best and rest should not have k!!!!
-  for k,t in pairs(all) do -- fill in the best,rest tables
-    what = k == goal and best or rest
-    for c,sym in pairs(t.syms) do
-      if indep(t,c) then
-        for x,count in pairs(sym.counts) do
-          what[k][c][x]  = (what[k][c][x] or 0) + count end end end end --return rank(all)
-  nb = #all[goal].rows
-  nr = #everything.rows - nb
-  print("nb",nb,"nr",nr)
-  print("best")
-  o(best)
-  print("rest")
-  o(rest)
-  for c,_ in pairs(best[goal]) do
-    for x,b in pairs(best[goal][c]) do
-      r = rest[goal][c][x] or 0
-      print(c,x,b,r)
-      b = b/(nb + 0.00001)
-      r = r/(nr + 0.00001)
-      if b > r then
-        order[#order+1] = {b^2/(b+r), c,x} end end end
+local function bestRest(both,   order,best,rest)
+  order={}
+  for k,t in pairs(both) do -- initialize the best rest tables
+    order[#order+1] = {t.nums[t.col['>dom']].mu, k} end
   ksort(1,order)
-  for _,o in pairs(order) do
-    print(o[1],o[2],o[3])
+  rest = order[1][2]
+  best = order[2][2]
+  return best,rest
+end
+
+local function look2(t,c,x,default,  tmp)
+  tmp = t.syms[c] 
+  if tmp then return tmp.counts[x] or default end
+  return default
+end
+
+local function  main(file,   all,both,best,rest,nb,nr,order,b,r)
+  all,both  = klasses(file)
+  best,rest = bestRest(both)
+  nb        = #both[best].rows
+  nr        = #both[rest].rows
+  order={}
+  for c,_ in pairs(all.name) do -- for all columns
+    if indep(all,c) then        -- for all independent columns
+      for x,_ in pairs(all.syms[c].counts) do -- for all symbols in column
+        b = look2(both[best],c,x,0.001)
+        r = look2(both[rest],c,x,0.001)
+        b = b/(nb + 0.00001)
+        r = r/(nr + 0.00001)
+        if b > r then
+          order[#order+1] = {-1*b^2/(b+r), c,x,b,r} end end end end
+  ksort(1,order)
+  for i,t in pairs(order) do
+    print(i,-1*t[1], all.name[t[2]],t[3],t[4],t[5])
   end
 end
 
--- Main function, if this is called top-level.
+-- Main function, if this is cbothed top-level.
 
 return {main= main}

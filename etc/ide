@@ -5,6 +5,7 @@ What=${What:-Duo101}
 Who=${Who:-Tim Menzies}
 When=${When:-2018}
 Repo=${Repo:-d-u-o/101}
+Lua=$(which luajit)
 #### end config
 
 ##############################################
@@ -42,7 +43,6 @@ for i in pycco lua luajit; do
 	fi
 done
 
-Lua=$(which lua)
 
 makedirs
 exe
