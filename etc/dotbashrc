@@ -15,12 +15,17 @@ htmls() {
   cd ../src
   pycco -i -d ../docs *.lua
 }
+gitready() {
+	git config --global credential.helper 'cache --timeout 3600'
+}
 push() {
+	gitready
 	git commit -am saving
 	git push
 	git status
 }
 pull() {
+	gitready
 	git pull
 }
 #--- tag line stuff
