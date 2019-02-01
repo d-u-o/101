@@ -45,7 +45,8 @@ require "sym"
 -- - `Data` may have one (and only) one `class` column.
 
 function data()
-  return {w={}, syms={}, nums={}, class=nil,  indeps={}, meta={},
+  return {w={}, syms={}, nums={}, class=nil,   
+          meta={}, x={}, y={},
           rows={}, name= {}, col={}, _use={}} 
 end
 
@@ -53,8 +54,9 @@ end
 -- of learning is often to find what parts of the former
 -- predict for the latter).
 
-function indep(t,c) return not t.meta[c] and not t.w[c] and t.class ~= c end
-function dep(t,c)   return not t.meta[c] and not indep(t,c) end
+function indep(t,c) return t.x[c] end
+function dep(t,c)   return t.y[c] end
+function meta(t,c)  return t.meta[c] end
 
 -- ## Making `data`
 -- ### Step1: `header`
@@ -67,7 +69,7 @@ function dep(t,c)   return not t.meta[c] and not indep(t,c) end
 -- - '$' is an independent  numeric colum;
 -- - '!' is a class column (and is not numeric).
 
-function header(cells,t,       c,w)
+function header(cells,t,       c,w,what)
   t = t or data()
   for c0,x in pairs(cells) do
     if not x:match("%?")  then
@@ -79,13 +81,16 @@ function header(cells,t,       c,w)
 	 then t.nums[c] = num() 
 	 else t.syms[c] = sym() 
       end 
-      if     x:match("<") then t.deps[ #t.deps+1]=c ; t.w[c]  = -1 
-      elseif x:match(">") then t.deps[ #t.deps+1]=c ; t.w[c]  =  1  
-      elseif x:match("!") then t.deps[ #t.deps+1]=c ; t.class =  c 
-      elseif x:match(":") then t.meta[ #t.meta + 1] =  c 
-      else   t.indeps[ #t.indeps+1 ] = c end end end
+      what = "cells"
+      if     x:match(":") then what = "meta"
+      elseif x:match("<") then t.w[c]  = -1 
+      elseif x:match(">") then t.w[c]  =  1  
+      elseif x:match("!") then t.class =  c 
+      end 
+      t[what][ #t[what] + 1 ] = c
+  end end 
   return t
-end
+end 
 
 -- For example, the above example call to `header` initializes
 -- a `data` with the following structure. 
@@ -133,9 +138,13 @@ end
 -- string to number conversions, and when to skip
 -- cells with an unknown value.
 
-function row1(t,cells,     x,r)
-  r= #t.rows+1
-  t.rows[r] = {}
+function row() 
+  return {cells={}, x0=0,y0=0, dom=0}
+end
+
+function row1(t,cells,     new, x,r)
+  new = row()
+  t.rows[ #t.rows+1 ] = new
   for c,c0 in pairs(t._use) do
     x = cells[c0]
     if x ~= "?" then
@@ -144,17 +153,21 @@ function row1(t,cells,     x,r)
         numInc(t.nums[c], x)
       else
 	symInc(t.syms[c], x)
-    end end
-    t.rows[r][c] = x  end
-  return t
+      end 
+      if   t.meta[c] 
+      then new[ t.name[c] ] = x
+      else new.cells[c] = x
+      end end end
+  return new
 end  
 
 function clone(data0, rows,   data1)
    data1 = header(data0.name)
    for _,cells in pairs(rows or data0.rows) do 
-     row(data1, cells) end
+     row1(data1, cells) end
+     for 
    return data1
-end
+end end
 
 -- ## Making `data` from Ram 
 --
