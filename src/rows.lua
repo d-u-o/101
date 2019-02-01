@@ -49,6 +49,10 @@ function data()
           rows={}, name= {}, col={}, _use={}} 
 end
 
+function row() 
+  return {id=id(), cells={}, x0=0, y0=0, dom=0}
+end
+
 -- Columns can be `indep`endent or `dep`endent (and the goal
 -- of learning is often to find what parts of the former
 -- predict for the latter).
@@ -133,9 +137,9 @@ end
 -- string to number conversions, and when to skip
 -- cells with an unknown value.
 
-function row(t,cells,     x,r)
+function row1(t,cells,     x,r)
   r= #t.rows+1
-  t.rows[r] = {}
+  t.rows[r] = row()
   for c,c0 in pairs(t._use) do
     x = cells[c0]
     if x ~= "?" then
@@ -145,7 +149,7 @@ function row(t,cells,     x,r)
       else
 	symInc(t.syms[c], x)
     end end
-    t.rows[r][c] = x  end
+    t.rows[r].cells[c] = x  end
   return t
 end  
 
@@ -181,7 +185,7 @@ end
 function rows(file,t,f0,f,      stream,txt,cells,r,line)
   return rows1( file and io.input(file) -- reading from some specified file
                       or io.input(),    -- reading from standard input
-                t  or data(), f0 or header, f or row) end 
+                t  or data(), f0 or header, f or row1) end 
 
 -- ## Making `data` from Ram 
 -- Note that if your data

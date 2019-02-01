@@ -23,12 +23,12 @@ function doms(t,  n,c,row1,row2,s)
   c= #t.name + 1
   print(cat(t.name,",") .. ",>dom")
   for r1=1,#t.rows do
-    row1 = t.rows[r1]
+    row1 = t.rows[r1].cells
     row1[c] = 0
     for s=1,n do
      row2 = another(r1,t.rows) 
      s = dom(t,row1,row2) and 1/n or 0
-     row1[c] = row1[c] + s end end
+     row1.dom = row1.dom + s end end
   dump(t.rows)
 end
 
