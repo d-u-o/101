@@ -45,20 +45,16 @@ require "sym"
 -- - `Data` may have one (and only) one `class` column.
 
 function data()
-  return {w={}, syms={}, nums={}, class=nil, 
+  return {w={}, syms={}, nums={}, class=nil,  indeps={}, meta={},
           rows={}, name= {}, col={}, _use={}} 
-end
-
-function row() 
-  return {id=id(), cells={}, x0=0, y0=0, dom=0}
 end
 
 -- Columns can be `indep`endent or `dep`endent (and the goal
 -- of learning is often to find what parts of the former
 -- predict for the latter).
 
-function indep(t,c) return not t.w[c] and t.class ~= c end
-function dep(t,c)   return not indep(t,c) end
+function indep(t,c) return not t.meta[c] and not t.w[c] and t.class ~= c end
+function dep(t,c)   return not t.meta[c] and not indep(t,c) end
 
 -- ## Making `data`
 -- ### Step1: `header`
@@ -73,7 +69,6 @@ function dep(t,c)   return not indep(t,c) end
 
 function header(cells,t,       c,w)
   t = t or data()
-  t.indeps = {}
   for c0,x in pairs(cells) do
     if not x:match("%?")  then
       c = #t._use+1
@@ -84,9 +79,10 @@ function header(cells,t,       c,w)
 	 then t.nums[c] = num() 
 	 else t.syms[c] = sym() 
       end 
-      if     x:match("<") then t.w[c]  = -1 
-      elseif x:match(">") then t.w[c]  =  1  
-      elseif x:match("!") then t.class =  c 
+      if     x:match("<") then t.deps[ #t.deps+1]=c ; t.w[c]  = -1 
+      elseif x:match(">") then t.deps[ #t.deps+1]=c ; t.w[c]  =  1  
+      elseif x:match("!") then t.deps[ #t.deps+1]=c ; t.class =  c 
+      elseif x:match(":") then t.meta[ #t.meta + 1] =  c 
       else   t.indeps[ #t.indeps+1 ] = c end end end
   return t
 end
@@ -139,7 +135,7 @@ end
 
 function row1(t,cells,     x,r)
   r= #t.rows+1
-  t.rows[r] = row()
+  t.rows[r] = {}
   for c,c0 in pairs(t._use) do
     x = cells[c0]
     if x ~= "?" then
@@ -149,7 +145,7 @@ function row1(t,cells,     x,r)
       else
 	symInc(t.syms[c], x)
     end end
-    t.rows[r].cells[c] = x  end
+    t.rows[r][c] = x  end
   return t
 end  
 
