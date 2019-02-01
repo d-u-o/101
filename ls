@@ -1,0 +1,11 @@
+CITATION.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+docs
+etc
+LICENSE.md
+ls
+README.md
+requirements.txt
+src
+test
