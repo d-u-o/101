@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+import sys
+from  dsl2 import Model,Things,S,A,F, Stock,Flow,Percent,Aux
+from pdb import set_trace
+
+class BrooksLaw(Model):
+    def __init__(self, params):
+        super(BrooksLaw, self).__init__(params)
+        self.params = params
+
+    def have(i): return Things(
+        aR    = Flow( "assimilationRate"),
+        co    = Percent(  "communicationOverhead"),
+        d     = Stock("developedSoftware",0),
+        ep    = Stock("experiencedPeople",int(i.params.ep)),
+        ept   = Aux(  "experiencedPeopleNeeded2Train"),
+        nprod = Aux(  "nominalProductity",0.1),
+        np    = Stock("newPersonnel",int(i.params.np)),
+        paR   = Flow( "personnelAllocationRate"),
+        ps    = Aux(  "plannedSoftware"),
+        sdR   = Flow( "softwareDevelopmentRate"),
+        ts    = Aux("teamSize",5),
+        to    = Percent( "trainingOverhead",25), # one-quarter of an experienced
+                                              # person's time is needed to
+                                              # train a new person until
+                                              # he/she is fully assimilated.
+        r     = Stock("requirements",500))
+
+    def step(self,dt,t,i,j):
+        def _co(x):
+          "Communication overhead"
+          myTeam = i.ts - 1   # talk to everyone in my team
+          others = x/i.ts - 1 # talk to every other team
+          return self.params.pomposity*(myTeam**2 + others**2) # pomposity
+        j.aR  = i.np/self.params.learning_curve # 20 = Learning curve
+        j.ps  = self.params.optimism*t # Optimism
+        j.co  = _co(i.ep + i.np)
+        j.paR = 6 if  (i.d - i.ps) < self.params.atleast and t < int(self.params.done_percent*t/100) else 0 # Don't touch 6 and zero.
+        j.sdR = i.nprod*(1-i.co/100)*(self.params.sDR_param1*i.np+self.params.sDR_param2*(i.ep - i.ept))
+        j.ept = i.np*i.to /100
+        j.ep += i.aR*dt
+        j.np += (i.paR - i.aR)*dt
+        j.d  += i.sdR*dt
+        j.r  +=  - i.sdR*dt
+
+if __name__ == "__main__":
+    params = Things()
+    for i, line in enumerate(sys.stdin):
+        kw = eval(line)
+        for arg, val in kw.items():
+            params.__dict__[arg] = float(val)
+        BrooksLaw(params).run(tmax=70)
+        break
