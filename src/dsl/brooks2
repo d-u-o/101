@@ -50,4 +50,3 @@ if __name__ == "__main__":
         for arg, val in kw.items():
             params.__dict__[arg] = float(val)
         BrooksLaw(params).run(tmax=70)
-        break

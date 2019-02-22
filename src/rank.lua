@@ -60,7 +60,7 @@ local function look2(t,c,x,default,  tmp)
   return default
 end
 
-local function  main(file,   all,both,best,rest,nb,nr,order,b,r)
+local function  main(file,   all,both,best,rest,nb,nr,order,b,r,s)
   all,both  = klasses(file)
   best,rest = bestRest(both)
   nb        = #both[best].rows
@@ -76,8 +76,10 @@ local function  main(file,   all,both,best,rest,nb,nr,order,b,r)
         if b > r then
           order[#order+1] = {-1*b^2/(b+r), c,x,b,r} end end end end
   ksort(1,order)
+  s = function (x) return int(100*x) end
   for i,t in pairs(order) do
-    print(i,-1*t[1], all.name[t[2]],t[3],t[4],t[5])
+    print(i,s(-1*t[1]), 
+            all.name[t[2]],t[3],s(t[4]),s(t[5]))
   end
 end
 
