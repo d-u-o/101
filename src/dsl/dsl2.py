@@ -156,13 +156,14 @@ with the current contents of working memory.
 class Model:
   def __init__(i, params):
     i.params = params
+
   def step(i):
     raise NotImplementedError(
              '"step" must be implemented in subclass')
   def have(i):
     raise NotImplementedError(
              '"have" must be implemented in subclass')
-  def run(i,dt=1,tmax=30):
+  def run(i, dt=1, tmax=30, print_head=True, verbose=False):
     have = i.have()
     t,b4  = 0, i.have().payload()
     head = ['?t']  
@@ -172,14 +173,22 @@ class Model:
       elif col == 'ep' or col == "np":
         head += ["<"+col]
       else:
-        head += [col]
-    say(head)
+        head += ["$"+col]
+
+    # Print the title of the table
+    if print_head:
+      say(head)
+
     while t < tmax:
       now = i.have().payload(b4)
       i.step(dt,t,b4,now)
       vals = [t] + i.have().asList(now)
-      say(list(map(lambda x: round(x, 2), vals)))
       t += dt
       b4 = now
-
-
+      if verbose:
+        say(list(map(lambda x: round(x, 2), vals)))
+      # Print the last evaluated column after running
+      # the model
+      
+      if t == tmax:
+        say(list(map(lambda x: round(x, 2), vals)))

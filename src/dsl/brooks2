@@ -11,20 +11,20 @@ class BrooksLaw(Model):
     def have(i): return Things(
         aR    = Flow( "assimilationRate"),
         co    = Percent(  "communicationOverhead"),
-        d     = Stock("developedSoftware",0),
+        d     = Stock("developedSoftware",i.params.d),
         ep    = Stock("experiencedPeople",int(i.params.ep)),
         ept   = Aux(  "experiencedPeopleNeeded2Train"),
-        nprod = Aux(  "nominalProductity",0.1),
+        nprod = Aux(  "nominalProductity",i.params.nprod),
         np    = Stock("newPersonnel",int(i.params.np)),
         paR   = Flow( "personnelAllocationRate"),
         ps    = Aux(  "plannedSoftware"),
         sdR   = Flow( "softwareDevelopmentRate"),
-        ts    = Aux("teamSize",5),
-        to    = Percent( "trainingOverhead",25), # one-quarter of an experienced
+        ts    = Aux("teamSize",i.params.ts),
+        to    = Percent( "trainingOverhead",i.params.to), # one-quarter of an experienced
                                               # person's time is needed to
                                               # train a new person until
                                               # he/she is fully assimilated.
-        r     = Stock("requirements",500))
+        r     = Stock("requirements",i.params.r))
 
     def step(self,dt,t,i,j):
         def _co(x):
@@ -49,4 +49,4 @@ if __name__ == "__main__":
         kw = eval(line)
         for arg, val in kw.items():
             params.__dict__[arg] = float(val)
-        BrooksLaw(params).run(tmax=70)
+        BrooksLaw(params).run(tmax=70, print_head=i==0, verbose=False)
