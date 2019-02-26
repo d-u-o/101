@@ -63,9 +63,9 @@ class o:
 
 In compartmental modelling:
     
-- `Stock`s store quantities;
-- `Flow`s dribble quanities between `Stock`s;
-- `Aux`illary variabes contain business logic.
++ `Stock`s store quantities;
++ `Flow`s dribble quanities between `Stock`s;
++ `Aux`illary variabes contain business logic.
 
 For our purposes, all of these are nearly the same so we represent
 them all as `Thing`s. `Stock, Flow, Aux` are subclasses of `Thing`.
@@ -86,8 +86,10 @@ class Thing:
     i.lo = i.lo if i.lo < i.init else i.init
     i.hi = i.hi if i.init < i.hi else i.init*2
     i.txt = 0,txt
+
   def restrain(i,x):
     return max(i.lo, min(i.hi, x))
+
   def rank(i):
     raise NotImplementedError(
              '"rank" must be implemented in subclass')

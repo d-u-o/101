@@ -35,13 +35,13 @@ class BrooksLaw(Model):
         j.aR  = i.np/self.params.learning_curve # 20 = Learning curve
         j.ps  = self.params.optimism*t # Optimism
         j.co  = _co(i.ep + i.np)
-        j.paR = 6 if  (i.d - i.ps) < self.params.atleast and t < int(self.params.done_percent*t/100) else 0 # Don't touch 6 and zero.
+        j.paR = 6 if  (i.ps - i.d) < self.params.atleast and t < int(self.params.done_percent*t/100) else 0 # Don't touch 6 and zero.
         j.sdR = i.nprod*(1-i.co/100)*(self.params.sDR_param1*i.np+self.params.sDR_param2*(i.ep - i.ept))
         j.ept = i.np*i.to /100
-        j.ep += i.aR*dt
+        j.ep += i.aR*dt # Is this correct?
         j.np += (i.paR - i.aR)*dt
         j.d  += i.sdR*dt
-        j.r  +=  - i.sdR*dt
+        j.r  -= i.sdR*dt
 
 if __name__ == "__main__":
     params = Things()
