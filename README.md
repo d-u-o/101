@@ -13,7 +13,9 @@ data | dom | label | discretize | best
 First install lua, luajit, pycco using your local package manager. Eg
 
 ```
-brew install lua luajit pycco
+brew install lua 
+brew install luajit 
+sudo -H pip install pycco
 ```
 Now:
 ```
