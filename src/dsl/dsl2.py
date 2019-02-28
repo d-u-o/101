@@ -7,8 +7,10 @@
 Printing stuff.
 """
 
+
 def say(lst):
-  print(', '.join([str(x) for x in lst]))
+    print(', '.join([str(x) for x in lst]))
+
 
 """
 ### Associative Arrays
@@ -41,21 +43,28 @@ the above value of `x`:
 
 """
 
+
 class o:
-  def __init__(i,**d): 
-    i.__dict__.update(d)
-  def items(i): 
-    return i.__dict__.items()
-  def keys(i): 
-    return sorted(list(i.__dict__.keys()))
-  def __setitem__(i,k,v):
-    i.__dict__[k] = v
-  def __getitem__(i,k): 
-    return i.__dict__[k]
-  def __repr__(i): 
-    tmp = ['%s=%s' % (k, i[k]) 
-           for k in i.keys() if k[0]  != "_"]
-    return 'o('+', '.join(tmp) + ')'
+    def __init__(i, **d):
+        i.__dict__.update(d)
+
+    def items(i):
+        return i.__dict__.items()
+
+    def keys(i):
+        return sorted(list(i.__dict__.keys()))
+
+    def __setitem__(i, k, v):
+        i.__dict__[k] = v
+
+    def __getitem__(i, k):
+        return i.__dict__[k]
+
+    def __repr__(i):
+        tmp = ['%s=%s' % (k, i[k])
+               for k in i.keys() if k[0] != "_"]
+        return 'o(' + ', '.join(tmp) + ')'
+
 
 """
 ----
@@ -79,33 +88,42 @@ a `lo` and `hi` value.
 
 """
 
+
 class Thing:
-  def __init__(i,txt='thing',init=None,lo=0,hi=100):
-    i.init = init if init != None else lo
-    i.lo,i.hi = lo,hi
-    i.lo = i.lo if i.lo < i.init else i.init
-    i.hi = i.hi if i.init < i.hi else i.init*2
-    i.txt = 0,txt
+    def __init__(i, txt='thing', init=None, lo=0, hi=100):
+        i.init = init if init != None else lo
+        i.lo, i.hi = lo, hi
+        i.lo = i.lo if i.lo < i.init else i.init
+        i.hi = i.hi if i.init < i.hi else i.init * 2
+        i.txt = 0, txt
 
-  def restrain(i,x):
-    return max(i.lo, min(i.hi, x))
+    def restrain(i, x):
+        return max(i.lo, min(i.hi, x))
 
-  def rank(i):
-    raise NotImplementedError(
-             '"rank" must be implemented in subclass')
+    def rank(i):
+        raise NotImplementedError(
+            '"rank" must be implemented in subclass')
 
-class Percent(Thing) : 
-  def rank(i): return 4
-class Flow(Thing) : 
-  def rank(i): return 3
-class Stock(Thing): 
-  def rank(i): return 1
-class Aux(Thing)  : 
-  def rank(i): return 2
+
+class Percent(Thing):
+    def rank(i): return 4
+
+
+class Flow(Thing):
+    def rank(i): return 3
+
+
+class Stock(Thing):
+    def rank(i): return 1
+
+
+class Aux(Thing):
+    def rank(i): return 2
 
 # Here some short hand for quickly specifying `Stock`s,`Aux`s, `Flow`s.
 
-S,A,F = Stock,Aux,Flow
+
+S, A, F = Stock, Aux, Flow
 
 """
 ----
@@ -126,21 +144,26 @@ of our `Thing`s.  These `payloads` can be updated
 with current contents of the working memory.
 
 """
+
+
 class Things:
-  def __init__(i,**things):
-    i.things = things
-    i.order = [k for k in sorted(i.things.keys(), 
-               key=lambda z:i.things[z].rank())]
-    for k in i.order:
-      i.things[k].name = k
-  def payload(i,old=None):
-    out = o(**{k:(i.things[k].init) for k in i.order})
-    if old:
-      for k,v in old.items():
-        out[k] = i.things[k].restrain(v)
-    return out
-  def asList(i,d):
-    return [d[k] for k in i.order]
+    def __init__(i, **things):
+        i.things = things
+        i.order = [k for k in sorted(i.things.keys(),
+                                     key=lambda z:i.things[z].rank())]
+        for k in i.order:
+            i.things[k].name = k
+
+    def payload(i, old=None):
+        out = o(**{k: (i.things[k].init) for k in i.order})
+        if old:
+            for k, v in old.items():
+                out[k] = i.things[k].restrain(v)
+        return out
+
+    def asList(i, d):
+        return [d[k] for k in i.order]
+
 
 """
 ----
@@ -155,42 +178,50 @@ with the current contents of working memory.
   right order.
 
 """
+
+
 class Model:
-  def __init__(i, params):
-    i.params = params
+    def __init__(i, params):
+        i.params = params
 
-  def step(i):
-    raise NotImplementedError(
-             '"step" must be implemented in subclass')
-  def have(i):
-    raise NotImplementedError(
-             '"have" must be implemented in subclass')
-  def run(i, dt=1, tmax=30, print_head=True, verbose=False):
-    have = i.have()
-    t,b4  = 0, i.have().payload()
-    head = ['?t']  
-    for col in i.have().order:
-      if col == "d":
-        head += [">d"]
-      elif col == 'ep' or col == "np":
-        head += ["<"+col]
-      else:
-        head += ["$"+col]
+    def step(i):
+        raise NotImplementedError(
+            '"step" must be implemented in subclass')
 
-    # Print the title of the table
-    if print_head:
-      say(head)
+    def have(i):
+        raise NotImplementedError(
+            '"have" must be implemented in subclass')
 
-    while t < tmax:
-      now = i.have().payload(b4)
-      i.step(dt,t,b4,now)
-      vals = [t] + i.have().asList(now)
-      t += dt
-      b4 = now
-      if verbose:
-        say(list(map(lambda x: round(x, 2), vals)))
-      # Print the last evaluated column after running
-      # the model
-      
-      if t == tmax:
-        say(list(map(lambda x: round(x, 2), vals)))
+    def run(i, dt=1, tmax=30, print_head=True, verbose=False):
+        have = i.have()
+        t, b4 = 0, i.have().payload()
+        head = ['?t']
+        for col in i.have().order:
+            if col == "d":
+                head += [">d"]
+            elif col == 'ep' or col == "np":
+                head += ["<" + col]
+            elif col == 'sDR':
+                head += ["?" + col]
+            else:
+                head += ["$" + col]
+
+        # Print the title of the table
+        if print_head:
+            say(head)
+
+        while t < tmax:
+            now = i.have().payload(b4)
+            keep_running = i.step(dt, t, b4, now)
+            vals = [t] + i.have().asList(now)
+            if not keep_running:
+                break
+            t += dt
+            b4 = now
+            if verbose:
+                say(list(map(lambda x: round(x, 2), vals)))
+            # Print the last evaluated column after running
+            # the model
+
+            if t == tmax:
+                say(list(map(lambda x: round(x, 2), vals)))

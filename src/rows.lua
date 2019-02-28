@@ -140,10 +140,10 @@ function row(t,cells,     x,r)
     x = cells[c0]
     if x ~= "?" then
       if t.nums[c] then 
-	x = tonumber(x)
+	      x = tonumber(x)
         numInc(t.nums[c], x)
       else
-	symInc(t.syms[c], x)
+	      symInc(t.syms[c], x)
     end end
     t.rows[r][c] = x  end
   return t
