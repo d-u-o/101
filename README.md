@@ -10,8 +10,23 @@ data | dom | label | discretize | best
 
 ## Install
 
+First install lua, luajit, pycco using your local package manager. Eg
+
+```
+brew install lua luajit pycco
+```
+Now:
+```
+cd src
+
+../etc/ide
+
+```
+## Running
+
+From then on, just
+
 ```
 cd src
 ../etc/ide
 ```
-
