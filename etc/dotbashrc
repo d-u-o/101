@@ -11,6 +11,15 @@ ok() {
   (cd ../test; $Lua $1.lua)
 }
 
+White="\033[00m"
+Red="\033[31m"
+Green="\033[01;32m"
+Yellow="\033[33m"
+Blue="\033[01;34m"
+Purple="\033[35m$"
+Turquoise="\033[36m$"
+
+
 htmls() {
   cd ../src
   pycco -i -d ../docs *.lua

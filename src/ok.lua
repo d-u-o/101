@@ -1,5 +1,7 @@
--- vim: tabstop=2:softtabstop=2:shiftwidth=2:expandtab
---------- --------- --------- --------- --------- --------- 
+#!/usr/bin/env lua
+-- vim: ft=lua ts=2 sw=2 sts=2 et:cindent:formatoptions+=cro
+--------- --------- --------- --------- --------- ---------
+
 require "config"
 
 function rogues(    ignore)

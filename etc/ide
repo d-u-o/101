@@ -3,7 +3,7 @@
 #### begin config
 What=${What:-Duo101}
 Who=${Who:-Tim Menzies}
-When=${When:-2018}
+When=${When:-2019}
 Repo=${Repo:-d-u-o/101}
 Lua=$(which luajit)
 #### end config
@@ -13,9 +13,9 @@ trap cleanup  0 1 2 3 6
 
 Tmp=${Tmp:-/tmp/$USER/ide/$$.$RANDOM}
 Ide=${Ide:-$(dirname $PWD)}
-Bin=${Bin:-"$Tmp"/bin}
 Etc=${Etc:-"$Ide"/etc}
 Src=${Src:-"$Ide"/src}
+Bin=${Bin:-$Src}
 Doc=${Doc:-"$Ide"/docs}
 Test=${Test:-"$Ide"/test}
 
@@ -36,13 +36,26 @@ makedirs()  { mkdir -p "$Src" "$Tmp" "$Bin" "$Etc" "$Test" "$Doc";
 requires()  { cat "$Etc"/requires.txt; }
 vimrc()     { . "$Etc"/dotvimrc.sh;    }
 
-for i in pycco lua luajit; do
-	if [ ! `which $i` ]; then
-		echo "Aborting. $i is missing."
-		exit 1
-	fi
-done
+box="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     box=Linux;;
+    Darwin*)    box=Mac;;
+    CYGWIN*)    box=Cygwin;;
+    MINGW*)     box=MinGw;;
+    *)          box="UNKNOWN:${unameOut}"
+esac
 
+if [ "$box" == "Linux" ]; then 
+   [ ! `which lua`     ] >&2 && sudo apt-get install lua
+   [ ! `which luajit`  ] >&2 && sudo apt-get install luajit
+   [ ! `which pycco`   ] >&2 && sudo -H pip install pycco
+fi
+
+if [ "$box" == "Mac"  ]; then 
+   [ ! `which lua`    ] >&2 && brew lua
+   [ ! `which luajit` ] >&2 && brew luajit
+   [ ! `which pycco`  ] >&2 && sudo -H pip install pycco
+fi
 
 makedirs
 exe
@@ -54,6 +67,12 @@ exists  "$Ide"/CODE_OF_CONDUCT.md  conduct
 exists  "$Ide"/CONTRIBUTING.md     contrib
 exists0 "$Tmp"/.vimrc              vimrc
 exists0 "$Tmp"/.bashrc             bashrc
+
+for f in $(ls $Src | grep -v '.lua') ; do
+  if [ -n "$(sed -n '/usr.bin.env/p;q' $f)" ]; then
+    chmod +x $f
+  fi
+done
 
 
 Bin="$Bin" Here="$Here" What="$What" Lua="$Lua" \

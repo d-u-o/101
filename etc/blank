@@ -1,10 +1,11 @@
-#!/usr/env/bin lua
--- vim: ts=2 sw=2 sts=2 expandtab:cindent:formatoptions+=cro  
---------- --------- --------- --------- --------- ---------  
+#!/usr/bin/env lua
+-- vim: ft=lua ts=2 sw=2 sts=2 et:cindent:formatoptions+=cro
+--------- --------- --------- --------- --------- ---------
 
-package.path = '../src/?.lua;' .. package.path 
-require "lib"
-require "ok"
+if not use then dofile '../use' fi
+
+use 'lib'
+use 'ok'
 
 function xxx()
 end
