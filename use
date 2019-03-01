@@ -5,11 +5,10 @@
 do 
   local root = '..'
   local seen = {}
-  function use(f,     g)
-    g = root .. '/' .. f
-    if not seen[g] then 
-      seen[g] = true
-      dofile(g)
+  function use(f)
+    if not seen[f] then 
+      seen[f] = true
+      dofile(root .. '/' .. f)
       io.stderr:write('-- ' .. f .. '\n')
   end end 
 end
