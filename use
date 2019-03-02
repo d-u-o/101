@@ -5,11 +5,14 @@
 do 
   local root = '..'
   local seen = {}
-  Luas = Luas or os.getenv('Luas') or '/opt/luas'
-  function use(f)
+  Ide = Ide or os.getenv('Ide') or '/opt/ide'
+  function use(f, show)
     if not seen[f] then 
-      seen[f] = true
-      dofile(Ide .. '/' .. f)
-      io.stderr:write('-- ' .. f .. '\n')
-  end end 
+      if show then io.stderr:write('-- ' .. f .. '\n') end
+      seen[f] = dofile(Ide .. '/' .. f)
+    end 
+    return seen[f]
+  end 
 end
+
+return use

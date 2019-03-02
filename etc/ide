@@ -74,9 +74,8 @@ for f in $(ls $Src | grep -v '.lua') ; do
   fi
 done
 
-
 Bin="$Bin" Here="$Here" What="$What" Lua="$Lua" \
-Who="$Who" When="$When" Repo="$Repo" Doc="$Doc" \
+Who="$Who" When="$When" Repo="$Repo" Doc="$Doc"  \
 Ide="$Ide" Tmp="$Tmp"   Etc="$Etc"   Test="$Test" \
-Src="$Src" \
+Src="$Src"                                         \
 bash --init-file "$Tmp"/.bashrc -i

@@ -1,4 +1,3 @@
-#!/usr/bin/env lua
 -- vim: ft=lua ts=2 sw=2 sts=2 et:cindent:formatoptions+=cro
 --------- --------- --------- --------- --------- ---------
 
@@ -93,6 +92,3 @@ function numXpect(i,j,   n)
   n = i.n + j.n +0.0001
   return i.n/n * i.sd+ j.n/n * j.sd
 end
-
-
-
