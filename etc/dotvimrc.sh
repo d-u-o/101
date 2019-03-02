@@ -24,7 +24,7 @@ set visualbell
 set number
 syntax enable
 set fillchars+=vert:\ 
-colorscheme torte
+colorscheme gruvbox
 hi VertSplit guifg=#202020 guibg=#202020 gui=NONE ctermfg=DarkGray ctermbg=DarkGray cterm=NONE
 set paste
 
@@ -33,4 +33,6 @@ if has("mouse_sgr")
 else
     set ttymouse=xterm2
 end
+set background=dark
+hi Normal guibg=NONE ctermbg=NONE
 EOF
