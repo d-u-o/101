@@ -26,4 +26,3 @@ eg4:  ; @$(hi); $(Auto) | dom | bestrest | super
 eg5:  ; @$(hi); $(Auto) | dom | bestrest | super | rank
 eg6:  ; @$(hi); $(Auto10) | dom | bestrest | super | rank
 eg7:  ; @$(hi); $(Auto1M) | dom | bestrest | super | rank
-
