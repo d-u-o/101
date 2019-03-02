@@ -50,7 +50,7 @@ here() { cd $1; basename "$PWD"; }
 
 PROMPT_COMMAND='echo -ne "${_c6}${What}> \033]0;$(here ../..)/$(here ..)/$(here .)\007";PS1="${_c1}$(here ../..)/$_c2$(here ..)/$_c3$(here .) ${_c6}\!>${_c0}\e[m "'
 
-alias ll='ls -GF'
+alias ls='ls -GF'
 alias vi="`which vim` -u $Tmp/.vimrc "
 
 cd $Src
