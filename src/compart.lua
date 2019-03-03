@@ -28,19 +28,12 @@ function things(t,      i,j,y)
   t.aux     = ksort("txt", t.aux)
   t.flow    = ksort("txt", t.flow)
   t.stock   = ksort("txt", t.stock)
-  t.txt,sep = "",""
-  thingsLabels(t,function(i,j,y) 
-    t.xt  = t.txt .. sep .. y.txt
-    sep   = ","
-  end)
+  t.all     = append(t.stock,t.flow,t.aux)
+  t.vals    = {}
+  for pos,thing in pairs(t.all) do
+    t.vals[thing.txt] = 0
+  end
   return t
-end
-
-function thingsLabel(lst, f)
-  for i,x in pairs {"stock","flow","aux"} do
-    for j,y in pairs(lst[x]) do
-      f(i,j,y)
-  end end 
 end
 
 function thingsRun(lst, opt, col)

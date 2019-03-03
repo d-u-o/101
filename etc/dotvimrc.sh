@@ -24,7 +24,7 @@ set visualbell
 set number
 syntax enable
 set fillchars+=vert:\ 
-colorscheme gruvbox
+colorscheme torte
 hi VertSplit guifg=#202020 guibg=#202020 gui=NONE ctermfg=DarkGray ctermbg=DarkGray cterm=NONE
 set paste
 

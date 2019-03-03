@@ -63,6 +63,14 @@ function dump(a,sep)
   for i=1,#a do print(cat(a[i],sep or ",")) end
 end
 
+function append(...)
+  local t={}
+  for _,x in pairs{...} do
+    for _,y in pairs(x) do
+      t[#t+1] = y end end
+  return t
+end
+
 function first(t)  return t[ 1] end
 function second(t) return t[ 2] end
 function last(t)   return t[#t] end
@@ -153,6 +161,17 @@ function cols(t,     numfmt, sfmt,noline,w,txt,sep)
         io.write(sep .. string.rep("-",w1)  )
         sep=", " end
       print("") end end
+end
+
+function map(t1,f,    t2)
+  t2 = {}
+  for i,v in pairs(t1) do t2[i] = f(v) end
+  return t2
+end
+
+function copy(t)
+  if type(t) ~= "table" then return t end
+  return map(t, copy)
 end
 
 --------- --------- --------- --------- --------- --------- 
