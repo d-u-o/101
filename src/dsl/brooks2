@@ -22,7 +22,7 @@ class BrooksLaw(Model):
         sdR=Flow("softwareDevelopmentRate"),
         ts=Aux("teamSize", i.params.ts),
         # one-quarter of an experienced
-        to=Percent("trainingOverhead", 0.25),
+        to=Percent("trainingOverhead", i.params.to),
         # person's time is needed to
         # train a new person until
         # he/she is fully assimilated.
