@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys
-from dsl2 import Model, Things, S, A, F, Stock, Flow, Percent, Aux
+from dsl2 import Model, Things, S, A, F, Stock, Flow, Percent, Aux, o
 from pdb import set_trace
 
 
@@ -56,7 +56,7 @@ class BrooksLaw(Model):
 
 
 if __name__ == "__main__":
-    params = Things()
+    params = o()
     for i, line in enumerate(sys.stdin):
         kw = eval(line)
         for arg, val in kw.items():

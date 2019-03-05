@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from pdb import set_trace
 
 """
 ----
@@ -53,6 +54,9 @@ class o:
 
     def keys(i):
         return sorted(list(i.__dict__.keys()))
+
+    def values(i):
+        return [i.__dict__[k] for k in i.keys()]
 
     def __setitem__(i, k, v):
         i.__dict__[k] = v
@@ -161,8 +165,11 @@ class Things:
                 out[k] = i.things[k].restrain(v)
         return out
 
-    def asList(i, d):
-        return [d[k] for k in i.order]
+    def asList(i, d, keys):
+        if not keys:
+            return [d[k] for k in i.order]
+        else:
+            return [d[k] for k in keys]
 
 
 """
@@ -196,7 +203,11 @@ class Model:
         have = i.have()
         t, b4 = 0, i.have().payload()
         head = ['?t']
-        for col in i.have().order:
+        changable = i.params.keys()
+        dsl_modif = i.have().order
+        common = list(set(changable).difference(dsl_modif))+list(set(changable).intersection(dsl_modif))
+
+        for col in common:
             if col == "d":
                 head += [">d"]
             elif col == 'ep' or col == "np":
@@ -209,14 +220,17 @@ class Model:
         # Print the title of the table
         if print_head:
             say(head)
+        
+
 
         while t < tmax:
             now = i.have().payload(b4)
-            keep_running = i.step(dt, t, b4, now)
+            params, now, keep_running = i.step(dt, t, b4, now)
+            # set_trace()
             if not keep_running:
                 break
-            keep_running = keep_running.have().payload(keep_running)
-            vals = [t] + i.have().asList(keep_running)
+            now = i.have().payload(now)
+            vals = [t] + i.params.values() + i.have().asList(now, keys = dsl_modif)
             t += dt
             b4 = now
             if verbose:
