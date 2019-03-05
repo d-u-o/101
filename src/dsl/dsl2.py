@@ -213,9 +213,10 @@ class Model:
         while t < tmax:
             now = i.have().payload(b4)
             keep_running = i.step(dt, t, b4, now)
-            vals = [t] + i.have().asList(now)
             if not keep_running:
                 break
+            keep_running = keep_running.have().payload(keep_running)
+            vals = [t] + i.have().asList(keep_running)
             t += dt
             b4 = now
             if verbose:

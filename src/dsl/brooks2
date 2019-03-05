@@ -43,14 +43,16 @@ class BrooksLaw(Model):
         j.sdR = i.nprod * (1 - i.co / 100) * (self.params.sDR_param1
                                               * i.np + self.params.sDR_param2 * (i.ep - i.ept))
         j.ept = i.np * i.to / 100
-        j.ep += i.aR * dt  # Is this correct?
+        j.ep += i.aR * dt
         j.np += (i.paR - i.aR) * dt
         j.d += i.sdR * dt
         if j.r < i.sdR * dt:
-            return False
-
-        j.r -= i.sdR * dt
-        return True
+            keep_running = False
+            return self.params, j, keep_running
+        else:
+            j.r -= i.sdR * dt
+            keep_running = True
+            return self.params, j, keep_running
 
 
 if __name__ == "__main__":
@@ -59,4 +61,4 @@ if __name__ == "__main__":
         kw = eval(line)
         for arg, val in kw.items():
             params.__dict__[arg] = float(val)
-        BrooksLaw(params).run(tmax=70, print_head=i == 0, verbose=True)
+        BrooksLaw(params).run(tmax=70, print_head=i == 0, verbose=False)
