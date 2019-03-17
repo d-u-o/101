@@ -46,17 +46,18 @@ use 'src/sym.lua'
 --   and w[c]==1 means _maximize_).
 -- - `Data` may have one (and only) one `class` column.
 
-function data()
-  return {w={}, syms={}, nums={}, class=nil, 
-          rows={}, name= {}, col={}, _use={}} 
+function data(header)
+  return {class=nil,  show=nil, name=header, xyz={}, nums={}, syms={},
+          x={}, y={},z={},  rows={} } 
 end
 
--- Columns can be `indep`endent or `dep`endent (and the goal
--- of learning is often to find what parts of the former
--- predict for the latter).
+function xyz() return {x={}, y={}, z={}} end
 
-function indep(t,c) return not t.w[c] and t.class ~= c end
-function dep(t,c)   return not indep(t,c) end
+function row() return {id=id(), x={}, y={}, z={}  } end
+
+function null(_)      return {} end
+function nullAdd(t,x) return x end
+function nullSub(t,x) return x end
 
 -- ## Making `data`
 -- ### Step1: `header`
@@ -69,23 +70,43 @@ function dep(t,c)   return not indep(t,c) end
 -- - '$' is an independent  numeric colum;
 -- - '!' is a class column (and is not numeric).
 
+local function meta(t,txt,    pos,what,add,about)
+  what = "x"
+  if txt:match(":")      then what = "z" end
+  if txt:match("[<>%!]") then what = "y" end
+  pos = #t[what] + 1
+  about,add = null(), nullAdd
+  if what ~= "z" then
+    if txt:match("[<>%$]") 
+    then about,add = num(),numAdd 
+         if what == "x" then t.nums[pos] = pos end
+    else about,add = sym(),symAdd
+         if what == "x" then t.syms[pos] = pos end
+    end
+  end
+  t[what][put] = {
+         txt=    txt, 
+         what=   what,
+         pos=    pos,
+         nump=   add == numAdd,
+         about=  about, 
+         classp= txt:match('!') ~= nil,
+         add=    function (z,r)
+                   if z ~= "?" then
+                     z = tonumber(z) or z
+                     r[what][pos] = z
+                     add( about, z) end end}
+  if txt:match("!") then t.classp = t[what][pos] end
+  return t[what][put] 
+end
+
 function header(cells,t,       c,w)
-  t = t or data()
-  t.indeps = {}
-  for c0,x in pairs(cells) do
+  if t.show then show(cells) end
+  t = t or data(cells))
+  t.name=cells
+  for c,x in pairs(cells) do
     if not x:match("%?")  then
-      c = #t._use+1
-      t._use[c] = c0
-      t.name[c] = x
-      t.col[x]  = c
-      if x:match("[<>%$]") 
-	 then t.nums[c] = num() 
-	 else t.syms[c] = sym() 
-      end 
-      if     x:match("<") then t.w[c]  = -1 
-      elseif x:match(">") then t.w[c]  =  1  
-      elseif x:match("!") then t.class =  c 
-      else   t.indeps[ #t.indeps+1 ] = c end end end
+      t.xyz[c] = meta(t,x) end end
   return t
 end
 
@@ -135,26 +156,20 @@ end
 -- string to number conversions, and when to skip
 -- cells with an unknown value.
 
-function row(t,cells,     x,r)
-  r= #t.rows+1
-  t.rows[r] = {}
-  for c,c0 in pairs(t._use) do
-    x = cells[c0]
-    if x ~= "?" then
-      if t.nums[c] then 
-	      x = tonumber(x)
-        numInc(t.nums[c], x)
-      else
-	      symInc(t.syms[c], x)
-    end end
-    t.rows[r][c] = x  end
+
+function rowAdd(t,cells,     r,val)
+  if t.show then show(cells)  end
+  r= row()
+  for c,xyz in pairs(t.xyz) do
+    xyz.add(cells[c], r) end
+  t.rows[ #t.rows + 1 ] = r
   return t
 end  
 
 function clone(data0, rows,   data1)
    data1 = header(data0.name)
    for _,cells in pairs(rows or data0.rows) do 
-     row(data1, cells) end
+     rowAdd(data1, cells) end
    return data1
 end
 
@@ -183,7 +198,7 @@ end
 function rows(file,t,f0,f,      stream,txt,cells,r,line)
   return rows1( file and io.input(file) -- reading from some specified file
                       or io.input(),    -- reading from standard input
-                t  or data(), f0 or header, f or row) end 
+                t  or data(), f0 or header, f or rowAdd) end 
 
 -- ## Making `data` from Ram 
 -- Note that if your data

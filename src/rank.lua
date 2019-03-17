@@ -1,6 +1,9 @@
 -- vim: ft=lua ts=2 sw=2 sts=2 et:cindent:formatoptions+=cro
 --------- --------- --------- --------- --------- ---------
 
+-- rank needs to change for indep
+
+-- function row : is changing
 if not use then dofile '../use' end
 
 use "src/lib.lua"

@@ -2,7 +2,7 @@
 -- vim: ft=lua ts=2 sw=2 sts=2 et:cindent:formatoptions+=cro
 --------- --------- --------- --------- --------- ---------
 
-function Lean0() return  {
+local function Lean0() return  {
   cohen    = 0.2,
   distance = {k=1, p=2, kernel="triangle", samples=64},
   dom      = {samples=100}, 
@@ -33,6 +33,13 @@ function Lean0() return  {
                sym  = "%20s"}, 
 } end
 
-Lean = Lean0()
+function Lean1(tmp, t, f) 
+  t,f,tmp = 0,0,Lean0()
+  if Lean then t, f = Lean.ok.tries, Lean.ok.fails end
+  tmp.ok.tries, tmp.ok.fails = t,f
+  return tmp
+end
 
-return Lean, Lean0
+Lean = Lean1()
+
+return Lean, Lean1

@@ -1,6 +1,10 @@
 -- vim: ft=lua ts=2 sw=2 sts=2 et:cindent:formatoptions+=cro
 --------- --------- --------- --------- --------- ---------
 
+if not use then dofile '../use' end
+
+use "src/lib.lua"
+
 -- ## Example
 
 --
@@ -17,7 +21,7 @@ end
 
 -- Add `x` to a `sym`:
 
-function symInc(t,x,   new,old)
+function symAdd(t,x,   new,old)
   if x=="?" then return x end
   t._ent= nil
   t.n = t.n + 1
@@ -31,7 +35,7 @@ end
 
 -- Remove `x` from a `sym`.
 
-function symDec(t,x)
+function symSub(t,x)
   t._ent= nil
   if t.n > 0 then
     t.n = t.n - 1
@@ -45,7 +49,7 @@ end
 function syms(t,f,       s)
   f=f or function(x) return x end
   s=sym()
-  for _,x in pairs(t) do symInc(s, f(x)) end
+  for _,x in pairs(t) do symAdd(s, f(x)) end
   return s
 end
 

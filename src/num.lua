@@ -1,6 +1,9 @@
 -- vim: ft=lua ts=2 sw=2 sts=2 et:cindent:formatoptions+=cro
 --------- --------- --------- --------- --------- ---------
 
+if not use then dofile '../use' end
+
+use "src/lib.lua"
 
 -- ## Example
 
@@ -22,14 +25,14 @@ end
 function nums(t,f,      n)
   f=f or function(x) return x end
   n=num()
-  for _,x in pairs(t) do numInc(n, f(x)) end
+  for _,x in pairs(t) do numAdd(n, f(x)) end
   return n
 end
 
 -- Incremenally, add `x` to a `num`.
 -- This is [Welford's algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm)
 
-function numInc(t,x,    d) 
+function numAdd(t,x,    d) 
   if x == "?" then return x end
   t.n  = t.n + 1
   d    = x - t.mu
@@ -60,7 +63,7 @@ end
 -- and very small sample sizes (small `n`,
 -- say, less than 5)
 
-function numDec(t,x,    d) 
+function numSub(t,x,    d) 
   if (x == "?") then return x end
   if (t.n == 1) then return x end
   t.n  = t.n - 1

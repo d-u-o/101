@@ -2,7 +2,9 @@
 -- vim: ft=lua ts=2 sw=2 sts=2 et:cindent:formatoptions+=cro
 --------- --------- --------- --------- --------- ---------
 
-require "config"
+if not use then dofile '../use' end
+
+use "src/config.lua"
 
 function rogues(    ignore)
   ignore = {jit=true, utf8=true, math=true, package=true, 
@@ -26,10 +28,7 @@ function ok(t,  n,score,      passed,err,s)
     Lean.ok.tries = Lean.ok.tries + 1
     print("-- Test #" .. Lean.ok.tries .. 
           " (oops=".. okReport() .."%). Checking ".. x .."... ")
-    local y,n = Lean.ok.tries, Lean.ok.fails
-    Lean = Lean0()
-    Lean.ok.tries = Lean.ok.tries+ y
-    Lean.ok.fails = Lean.ok.fails+ n
+    Lean = Lean1()
     passed,err = pcall(f)
     if not passed then
       Lean.ok.fails = Lean.ok.fails + 1

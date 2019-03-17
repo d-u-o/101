@@ -1,9 +1,10 @@
 -- vim: ts=2 sw=2 sts=2 expandtab:cindent:formatoptions+=cro 
 --------- --------- --------- --------- --------- --------- 
 
-package.path = '../src/?.lua;' .. package.path
-require "lib"
-require "ok"
+if not use then dofile '../use' end
+
+use "src/lib.lua"
+use "src/ok.lua"
 
 ok {fails = function() assert(1==2) end }
 ok {passes = function() assert(1==1) end }
