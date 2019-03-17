@@ -40,8 +40,8 @@ class BrooksLaw(Model):
         # Don't touch 6 and zero.
         j.paR = 6 if (
             i.ps - i.d) < self.params.atleast and t < int(self.params.done_percent * t / 100) else 0
-        j.sdR = i.nprod * (1 - i.co / 100) * (self.params.sDR_param1
-                                              * i.np + self.params.sDR_param2 * (i.ep - i.ept))
+        j.sdR = i.nprod * (1 - i.co / 100) * (self.params.productivity_new
+                                              * i.np + self.params.productivity_exp * (i.ep - i.ept))
         j.ept = i.np * i.to / 100
         j.ep += i.aR * dt
         j.np += (i.paR - i.aR) * dt
