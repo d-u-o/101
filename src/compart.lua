@@ -5,10 +5,11 @@ if not use then dofile '../use' end
 
 use 'src/lib.lua'
 
-function thing(txt,lo,hi)
-  return { txt= txt, 
-           lo = lo or 0, 
-           hi = hi or 100 }
+function T(txt,init,lo,hi)
+  return { txt  = txt, 
+           init = init or 0,
+           lo   = lo or 0, 
+           hi   = hi or 100 }
 end
 
 function restrain(t,x)
@@ -28,7 +29,7 @@ function things(t,      i,j,y)
   t.aux     = ksort("txt", t.aux)
   t.flow    = ksort("txt", t.flow)
   t.stock   = ksort("txt", t.stock)
-  t.all     = append(t.stock,t.flow,t.aux)
+  t.all     = appends(t.stock,t.flow,t.aux)
   t.vals    = {}
   for pos,thing in pairs(t.all) do
     t.vals[thing.txt] = 0
@@ -36,6 +37,28 @@ function things(t,      i,j,y)
   return t
 end
 
-function thingsRun(lst, opt, col)
-    lst[what][pos] = head
+function thingsRun(t)
 end
+
+
+Diapers = {T{
+class Diapers(Model):
+  def have(i):
+    return Things(C = S('clean diapers',100), 
+                  D = S('dirty diapers', 0),
+                  q = F('cleaning rate',0),  
+                  r = F('poop rate',8), 
+                  s = F('resupply',0))
+  def step(i,dt,t,u,v):
+    def saturday(x): return int(x) % 7 == 6
+    v.C +=  dt*(u.q - u.r)
+    v.D +=  dt*(u.r - u.s)
+    v.q  =  70  if saturday(t) else 0 
+    v.s  =  u.D if saturday(t) else 0
+    if t == 27: # special case (the day i forget)
+      v.s = 0
+
+if __name__ == "__main__":
+    Diapers().run(tmax=70)
+
+

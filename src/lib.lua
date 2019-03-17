@@ -63,7 +63,7 @@ function dump(a,sep)
   for i=1,#a do print(cat(a[i],sep or ",")) end
 end
 
-function append(...)
+function appends(...)
   local t={}
   for _,x in pairs{...} do
     for _,y in pairs(x) do
