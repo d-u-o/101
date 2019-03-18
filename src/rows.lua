@@ -47,11 +47,10 @@ use 'src/sym.lua'
 -- - `Data` may have one (and only) one `class` column.
 
 function data(header)
-  return {class=nil,  show=nil, names={}, name=header, xyz={}, nums={}, syms={},
+  return {show=nil, header=header, 
+          at={names={},cols={},nums={}, syms={},class=nil}
           x={}, y={},z={},  rows={} } 
 end
-
-function xyz() return {x={}, y={}, z={}} end
 
 function row() return {id=id(), x={}, y={}, z={}  } end
 
@@ -59,39 +58,52 @@ function null(_)      return {} end
 function nullAdd(t,x) return x end
 function nullSub(t,x) return x end
 
-local function cell(r,val,what,pos,add)
-  if val ~= "?" then
-    val = tonumber(val) or val
-    r[what][pos] = val
-    add( about, val) end 
+local function cell(r,val,where,pos,add)
+  local function where(txt)
+  if     txt:match(":")      then return "z" 
+  elseif txt:match("[<>%!]") then return "y"
+  else                            return "x"
 end
 
-local function column(t,c,txt,    pos,what,add,about,tmp)
-  what = "x"
-  if txt:match(":")      then what = "z" end
-  if txt:match("[<>%!]") then what = "y" end
-  pos = #t[what] + 1
-  about,add = null(), nullAdd
-  if what ~= "z" then
-    if txt:match("[<>%$]") 
-    then about,add = num(),numAdd 
-         if what == "x" then t.nums[pos] = pos end
-    else about,add = sym(),symAdd
-         if what == "x" then t.syms[pos] = pos end
-  end end
-  tmp= {
-    txt=    txt, 
-    pos=    pos,
-    what=   what,
-    about=  about, 
-    nump=   add == numAdd,
-    classp= txt:match('!') ~= nil,
-    add=    function (r,z) cell(r,z,what,pos,add) end
-  }
-  if txt:match("!") then t.classp = tmp end
-  t[what][put]   = tmp
-  t.nameHas[txt] = tmp
-  t.has[c]       = tmp
+local function about(w)
+  if     w.where == "z" then return null() 
+  elseif w.nump         then return num()
+  else                       return sym()
+end
+
+local function add1(w)
+  if     w.where == "z" then return nullAdd
+  elseif w.nump         then return numAdd
+  else                       return symAdd
+  end
+end
+
+local function add(w,     where,pos,add)
+  where = w.where
+  pos   = w.pos
+  add   = add1(w)
+  return function(r,val) 
+           if val ~= "?" then
+              val = tonumber(val) or val
+              r[where][pos] = val
+              add(about,val) end 
+end
+
+local function column(t,c,txt,    w,}
+  w        = {name=txt, pos=c}
+  w.nump   = txt:match("[<>%$]") ~= nil 
+  w.classp = txt:match('!')      ~= nil
+  w.where  = where(txt,w)
+  w.pos    = #t[w.where] + 1
+  w.about  = about(w)
+  w.add    = add(w)
+  if t.where ~= "z" then
+     if t.nump then t.at.nums[w.pos] = w else t.at.syms[w.pos] = w end
+  end
+  t[where][pos] = w
+  t.at.names[txt] = w
+  t.at.cols[c]   = w
+  if w.classp then t.at.classp = w end
 end
 
 function header(cells,d,       c,w)
