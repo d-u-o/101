@@ -48,7 +48,7 @@ use 'src/sym.lua'
 
 function data(header)
   return {show=nil, header=header, 
-          at={names={},cols={},nums={}, syms={},class=nil}
+          at={names={},cols={},class=nil}
           x={}, y={},z={},  rows={} } 
 end
 
@@ -58,35 +58,32 @@ function null(_)      return {} end
 function nullAdd(t,x) return x end
 function nullSub(t,x) return x end
 
-local function cell(r,val,where,pos,add)
-  local function where(txt)
-  if     txt:match(":")      then return "z" 
-  elseif txt:match("[<>%!]") then return "y"
-  else                            return "x"
+local function where(txt)
+  if   txt:match(":") then return "z" 
+  else return txt:match("[<>%!]") and "y" or "x" end
+end
+
+local function weight(txt,out)
+  return  txt:match("<") and 1 or -1 
 end
 
 local function about(w)
-  if     w.where == "z" then return null() 
-  elseif w.nump         then return num()
-  else                       return sym()
+  if   w.where == "z" then return null() 
+  else return w.nump and num() or sym() end
 end
 
-local function add1(w)
-  if     w.where == "z" then return nullAdd
-  elseif w.nump         then return numAdd
-  else                       return symAdd
-  end
+local function add(w)
+  if   w.where == "z" then return nullAdd
+  else return w.nump and numAdd or symAdd end
 end
 
-local function add(w,     where,pos,add)
-  where = w.where
-  pos   = w.pos
-  add   = add1(w)
-  return function(r,val) 
-           if val ~= "?" then
-              val = tonumber(val) or val
-              r[where][pos] = val
-              add(about,val) end 
+local function keeper(w,    xyz,pos,f)
+  xyz, pos, header, f = w.where, w.pos, w.about, add(w)
+  return function (r,val)
+    if val ~= "?" then
+      val = tonumber(val) or val
+      r[xyz][pos] = val
+      f(header,val) end end 
 end
 
 local function column(t,c,txt,    w,}
@@ -96,10 +93,8 @@ local function column(t,c,txt,    w,}
   w.where  = where(txt,w)
   w.pos    = #t[w.where] + 1
   w.about  = about(w)
-  w.add    = add(w)
-  if t.where ~= "z" then
-     if t.nump then t.at.nums[w.pos] = w else t.at.syms[w.pos] = w end
-  end
+  w.weight = weight(txt)
+  w.add    = keeper(w)  
   t[where][pos] = w
   t.at.names[txt] = w
   t.at.cols[c]   = w
