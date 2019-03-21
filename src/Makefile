@@ -10,7 +10,7 @@ Auto=cat $(Test)/data/auto.csv
 Auto10=cat $(Test)/data/auto10000.csv
 Auto1M=cat $(Test)/data/auto1M.csv
 Weather=cat $(Test)/data/auto.csv
-DSL= dsl/monte_carlo -n 1000 -s 1729| dsl/brooks2
+DSL= dsl/monte_carlo -n 3000 -s 1729| dsl/brooks2
 
 ok:; @bash $(Etc)/lua2bin
 
@@ -19,6 +19,7 @@ eg0a: ok; @$(hi); $(DSL) | dom | bestrest | super
 eg0b: ok; @$(hi); $(DSL) | dom | bestrest |super
 eg1:  ok; @$(hi); cat $(Test)/data/weather.csv | dom
 eg2:  ok; @$(hi); $(Auto) | dom | $(some); $(Auto) | head -1 | $(some)
+eg2a: ok; @$(hi); $(Auto) | dom 
 eg3:  ok; @$(hi); $(Auto) | dom | bestrest
 eg4:  ok; @$(hi); $(Auto) | dom | bestrest | super
 eg5:  ok; @$(hi); $(Auto) | dom | bestrest | super | rank
