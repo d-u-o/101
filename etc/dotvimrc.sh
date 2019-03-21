@@ -28,7 +28,7 @@ colorscheme torte
 hi VertSplit guifg=#202020 guibg=#202020 gui=NONE ctermfg=DarkGray ctermbg=DarkGray cterm=NONE
 set paste
 
-f has("mouse_sgr")
+if has("mouse_sgr")
     set ttymouse=sgr
 else
     set ttymouse=xterm2
