@@ -11,15 +11,15 @@ class MonteCarlo:
         self.attr = {
             "pomposity": {
                 "min": 0,
-                "max": 1
+                "max": 100
             },
             "learning_curve": {
-                "min": 100,
+                "min": 1,
                 "max": 100
             },
             "optimism": {
                 "min": 0.1,
-                "max": 1
+                "max": 100
             },
             "atleast": {
                 "min": 0,
@@ -42,28 +42,28 @@ class MonteCarlo:
                 "max": 1
             },
             "ep": {
-                "min": 10,
+                "min": 1,
                 "max": 10
             },
             "nprod": {
                 "min": 0.1,
-                "max": 1
+                "max": 10
             },
             "np": {
-                "min": 30,
+                "min": 1,
                 "max": 30
             },
             "ts": {
                 "min": 1,
-                "max": 10
+                "max": 100
             },
             "to": {
                 "min": 1,
-                "max": 10
+                "max": 100
             },
             "r": {
-                "min": 1000,
-                "max": 10000
+                "min": 1,
+                "max": 1000
             },
         }
 

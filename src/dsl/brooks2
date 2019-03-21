@@ -43,9 +43,8 @@ class BrooksLaw(Model):
         j.sdR = i.nprod * (1 - i.co / 100) * (self.params.productivity_new
                                               * i.np + self.params.productivity_exp * (i.ep - i.ept))
         j.ept = i.np * i.to / 100
-        j.ep += int(i.aR) * dt
-        # j.np = i.np
-        j.np += int((i.paR - i.aR)) * dt
+        j.ep += i.aR * dt
+        j.np += (i.paR - i.aR) * dt
         j.d += i.sdR * dt
         j.r -= i.sdR * dt
         return j
@@ -57,4 +56,4 @@ if __name__ == "__main__":
         kw = eval(line)
         for arg, val in kw.items():
             params.__dict__[arg] = float(val)
-        BrooksLaw(params).run(tmax=70, print_head=i == 0, verbose=False)
+        BrooksLaw(params).run(tmax=30, print_head=i == 0, verbose=True)

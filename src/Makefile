@@ -10,11 +10,7 @@ Auto=cat $(Test)/data/auto.csv
 Auto10=cat $(Test)/data/auto10000.csv
 Auto1M=cat $(Test)/data/auto1M.csv
 Weather=cat $(Test)/data/auto.csv
-<<<<<<< Updated upstream
-DSL= dsl/monte_carlo -n 3000 -s 1729| dsl/brooks2
-=======
-DSL= dsl/monte_carlo -n 1500 -s 1729| dsl/brooks2
->>>>>>> Stashed changes
+DSL= dsl/monte_carlo -n 2000 -s 1729| dsl/brooks2
 
 ok:; @bash $(Etc)/lua2bin
 

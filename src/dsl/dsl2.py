@@ -208,7 +208,6 @@ class Model:
     def run(i, dt=1, tmax=30, print_head=True, verbose=False):
         have = i.have()
         t, b4 = 0, i.have().payload()
-        # head = ['?t']
         head = ['?t']
         changable = i.params.keys()
         dsl_modif = i.have().order
