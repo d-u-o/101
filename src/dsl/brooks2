@@ -43,16 +43,12 @@ class BrooksLaw(Model):
         j.sdR = i.nprod * (1 - i.co / 100) * (self.params.productivity_new
                                               * i.np + self.params.productivity_exp * (i.ep - i.ept))
         j.ept = i.np * i.to / 100
-        j.ep += i.aR * dt
-        j.np += (i.paR - i.aR) * dt
+        j.ep += int(i.aR) * dt
+        # j.np = i.np
+        j.np += int((i.paR - i.aR)) * dt
         j.d += i.sdR * dt
-        if j.r < i.sdR * dt:
-            keep_running = False
-            return self.params, j, keep_running
-        else:
-            j.r -= i.sdR * dt
-            keep_running = True
-            return self.params, j, keep_running
+        j.r -= i.sdR * dt
+        return j
 
 
 if __name__ == "__main__":

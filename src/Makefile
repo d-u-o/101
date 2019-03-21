@@ -10,13 +10,17 @@ Auto=cat $(Test)/data/auto.csv
 Auto10=cat $(Test)/data/auto10000.csv
 Auto1M=cat $(Test)/data/auto1M.csv
 Weather=cat $(Test)/data/auto.csv
+<<<<<<< Updated upstream
 DSL= dsl/monte_carlo -n 3000 -s 1729| dsl/brooks2
+=======
+DSL= dsl/monte_carlo -n 1500 -s 1729| dsl/brooks2
+>>>>>>> Stashed changes
 
 ok:; @bash $(Etc)/lua2bin
 
 eg0:  ok; @$(hi); $(DSL) | dom | bestrest | super | rank
 eg0a: ok; @$(hi); $(DSL) | dom | bestrest | super
-eg0b: ok; @$(hi); $(DSL) | dom | bestrest |super
+eg0b: ok; @$(hi); $(DSL) 
 eg1:  ok; @$(hi); cat $(Test)/data/weather.csv | dom
 eg2:  ok; @$(hi); $(Auto) | dom | $(some); $(Auto) | head -1 | $(some)
 eg2a: ok; @$(hi); $(Auto) | dom 

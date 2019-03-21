@@ -3,7 +3,7 @@ from pdb import set_trace
 
 """
 ----
-## Utilities
+# Utilities
 
 Printing stuff.
 """
@@ -14,7 +14,7 @@ def say(lst):
 
 
 """
-### Associative Arrays
+# Associative Arrays
 
 Associative arrays in Python. After creating an `o` with
 
@@ -34,7 +34,7 @@ symbolic access:
     x["aa"] *= 10
     print(x.aa) # --> 100
 
-Also `o` objects know how to print themselves in 
+Also `o` objects know how to print themselves in
 alphabetical order of their keys.  Further, they don;t
 print "secret" keys (those that start with "`_`".; e.g
 `_cc` in the above). For example, continuing with
@@ -72,10 +72,10 @@ class o:
 
 """
 ----
-## `Stock`s, `Flow`, `Aux`illary Variables
+# `Stock`s, `Flow`, `Aux`illary Variables
 
 In compartmental modelling:
-    
+
 + `Stock`s store quantities;
 + `Flow`s dribble quanities between `Stock`s;
 + `Aux`illary variabes contain business logic.
@@ -84,10 +84,10 @@ For our purposes, all of these are nearly the same so we represent
 them all as `Thing`s. `Stock, Flow, Aux` are subclasses of `Thing`.
 All these `Thing`s have different `rank`s (so when we print a
 list of `Thing`s, we can sort them out
-into all the `Stock`s, before all the `Aux`s before all the 
+into all the `Stock`s, before all the `Aux`s before all the
 `Flow`s.
 
-Also, `Things` restrain themselves to always be between 
+Also, `Things` restrain themselves to always be between
 a `lo` and `hi` value.
 
 """
@@ -165,16 +165,22 @@ class Things:
                 out[k] = i.things[k].restrain(v)
         return out
 
-    def asList(i, d, keys):
+    def asList(i, d, other, keys):
         if not keys:
             return [d[k] for k in i.order]
         else:
-            return [d[k] for k in keys]
+            lst = []
+            for k in keys:
+                try:
+                    lst.append(d[k])
+                except KeyError:
+                    lst.append(other[k])
+            return lst
 
 
 """
 ----
-## Models
+# Models
 
 `Model`s run `Things` from time 0 to `tmax` (defaults to 30).
 At each step
@@ -202,12 +208,16 @@ class Model:
     def run(i, dt=1, tmax=30, print_head=True, verbose=False):
         have = i.have()
         t, b4 = 0, i.have().payload()
+        # head = ['?t']
         head = ['?t']
         changable = i.params.keys()
         dsl_modif = i.have().order
-        common = list(set(changable).difference(dsl_modif))+list(set(changable).intersection(dsl_modif))
-
-        for col in common:
+        common = list(set(changable).difference(dsl_modif)) + \
+            list(set(changable).intersection(dsl_modif))
+        select = changable + dsl_modif
+        select = [s for s in select if s in common]
+        select_id = [i for i, s in enumerate(select) if s in common]
+        for col in changable:
             if col == "d":
                 head += [">d"]
             elif col == 'ep' or col == "np":
@@ -220,23 +230,27 @@ class Model:
         # Print the title of the table
         if print_head:
             say(head)
-        
-
 
         while t < tmax:
             now = i.have().payload(b4)
-            params, now, keep_running = i.step(dt, t, b4, now)
-            # set_trace()
-            if not keep_running:
-                break
+            now = i.step(dt, t, b4, now)
             now = i.have().payload(now)
-            vals = [t] + i.params.values() + i.have().asList(now, keys = dsl_modif)
+            vals = [t]
+
+            therest = i.have().asList(now, i.params, keys=changable)
+            for k, elem in enumerate(therest):
+                vals.append(elem)
+
             t += dt
             b4 = now
+            if vals[2] >= 100:
+                say(list(map(lambda x: round(x, 2), vals)))
+                break
+
             if verbose:
                 say(list(map(lambda x: round(x, 2), vals)))
+
             # Print the last evaluated column after running
             # the model
-
             if t == tmax:
                 say(list(map(lambda x: round(x, 2), vals)))
