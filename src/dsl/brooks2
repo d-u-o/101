@@ -56,5 +56,9 @@ if __name__ == "__main__":
         kw = eval(line)
         for arg, val in kw.items():
             params.__dict__[arg] = float(val)
+<<<<<<< HEAD
         BrooksLaw(params).run(tmax=30, print_head=i
                               == 0, verbose=kw['verbose'])
+=======
+        BrooksLaw(params).run(tmax=30, print_head=i == 0, verbose=False)
+>>>>>>> ed14e5e42d52a5cac95e4a209f79950c1ba6567b
