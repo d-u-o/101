@@ -71,7 +71,7 @@ local function nump(t)    return t.txt:match("[<>%$]") ~= nil end
 
 local function about(t)
   if     t.where == "z" then return null(), nullAdd 
-  elseif nump(x.txt)    then return num(),  numAdd 
+  elseif nump(t.txt)    then return num(),  numAdd 
   else   return sym(), symAdd end
 end
 
@@ -105,9 +105,9 @@ local function xyz0(aXyz,cells,       pos,m,to,t)
   return aXyz
 end
 
-function flatten3(aXyz,three,out)
+function flatten3(aXyz,one)
   return map(aXyz,at.map, function (x) return 
-             three[x.where][x.to] end)
+             one[x.where][x.to] end)
 end
 
 function xyzAdd(aXyz,cells,     new,val)
