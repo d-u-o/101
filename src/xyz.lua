@@ -59,25 +59,27 @@ local function null(_)      return {} end
 local function nullAdd(t,x) return x end
 local function nullSub(t,x) return x end
 
-local function where(x)
-  if   x.txt:match(":") then return "z" 
+local function where(t)
+  if   t.txt:match(":") then return "z" 
   else return x.txt:match("[<>%!]") and "y" or "x" end 
 end
 
-local function nunp(x)   return  x.txt:match("[<>%$]") ~= nil end
-local function weight(x) return  x.txt:match("<") and -1 or 1 end
+local function ignorep(t) return t.txt:find("?")  ~= nil end
+local function classp(t)  return t.txt:match("!") ~= nil end
+local function weight(t)  return t.txt:match("<") and -1 or 1 end
+local function nump(t)    return t.txt:match("[<>%$]") ~= nil end
 
-local function about(x)
-  if     x.where == "z" then return null(), nullAdd 
+local function about(t)
+  if     t.where == "z" then return null(), nullAdd 
   elseif nump(x.txt)    then return num(),  numAdd 
   else   return sym(), symAdd end
 end
 
-local function column(x, new,add)
-  new,add = about(x)
+local function column(t, new,add)
+  new,add = about(t)
   new.add = add
-  new.txt = x.txt
-  new.w   = weight(x)
+  new.txt = t.txt
+  new.w   = weight(t)
   return new
 end
 
@@ -87,7 +89,7 @@ local function xyz0(aXyz,cells,       pos,m,to,t)
   aXyz.header = cells
   to=0
   for from,txt in pairs(cells) do
-    if txt:find("?") ~= nil then
+    if not ignorep(txt) then
       to       = to + 1
       t        = {from=from, to=to, txt=txt}
       t.where  = where(t)
@@ -96,7 +98,7 @@ local function xyz0(aXyz,cells,       pos,m,to,t)
       t,pos    = w == "z" and txt or #m+1
       m[t.pos] = t.about
       push(aXyz.at.map, t)
-      if txt:find("!") then aXyz.at.class = t end 
+      if classp(txt) then aXyz.at.class = t end 
       if w=="x" then
           push( nump(txt) and aXyz.at.xnums or aXyz.at.xsyms,
                 t) end end end
@@ -113,7 +115,7 @@ function xyzAdd(aXyz,cells,     new,val)
   new = three()
   for _,t in pairs(aXyz.at.map) do
     val = cells[t.from]
-    if val ~= '?' then
+    if not ignorep(val) then
       val = tonumber(val) or val
       t.about.add(t.about, val)
       new[t.where][t.pos] = val end end
