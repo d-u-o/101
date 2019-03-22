@@ -55,57 +55,51 @@ function xyz(header)
           all={} } 
 end
 
-function null(_)      return {} end
-function nullAdd(t,x) return x end
-function nullSub(t,x) return x end
+local function null(_)      return {} end
+local function nullAdd(t,x) return x end
+local function nullSub(t,x) return x end
 
-local function where(txt)
-  if   txt:match(":") then return "z" 
-  else return txt:match("[<>%!]") and "y" or "x" end 
+local function where(x)
+  if   x.txt:match(":") then return "z" 
+  else return x.txt:match("[<>%!]") and "y" or "x" end 
 end
 
-local function nunp(txt)
-    return  txt:match("[<>%$]") ~= nil 
-end
+local function nunp(x)   return  x.txt:match("[<>%$]") ~= nil end
+local function weight(x) return  x.txt:match("<") and -1 or 1 end
 
-local function about(w,txt)
-  if     w == "z"  then return null(), nullAdd 
-  elseif nump(txt) then return num(), numAdd 
+local function about(x)
+  if     x.where == "z" then return null(), nullAdd 
+  elseif nump(x.txt)    then return num(),  numAdd 
   else   return sym(), symAdd end
 end
 
-local function weight(txt)
-  return  txt:match("<") and -1 or 1 
-end
-
-function column(w,txt, new,add)
-  new,add = about(w,txt)
+local function column(x, new,add)
+  new,add = about(x)
   new.add = add
-  new.txt = txt
-  new.w   = weight(txt)
+  new.txt = x.txt
+  new.w   = weight(x)
   return new
 end
 
-function xyz0(aXyz,cells,       to,w,a,m,pos,tmp)
-  aXyz = aXyz or xyz(cells))
+local function xyz0(aXyz,cells,       pos,m,to,t)
+  aXyz = aXyz or xyz(cells)
   if aXyz.show then show(cells) end
   aXyz.header = cells
-  to = 0
+  to=0
   for from,txt in pairs(cells) do
     if txt:find("?") ~= nil then
-      w     = where(txt)
-      a     = column(w,txt)
-      m     = aXyz.meta[w]
-      to    = to+1
-      pos   = #m+1
-      pos   = w == "z" and txt or pos
-      m[pos]= a
-      tmp   = {from=from,to=to,where=w,txt=txt,pos=pos,about=a} 
-      push(aXyz.at.map, tmp)
-      if txt:find("!") then aXyz.at.class = tmp end 
+      to       = to + 1
+      t        = {from=from, to=to, txt=txt}
+      t.where  = where(t)
+      t.about  = column(t)
+      m        = aXyz.meta[t.where]
+      t,pos    = w == "z" and txt or #m+1
+      m[t.pos] = t.about
+      push(aXyz.at.map, t)
+      if txt:find("!") then aXyz.at.class = t end 
       if w=="x" then
           push( nump(txt) and aXyz.at.xnums or aXyz.at.xsyms,
-                tmp) end end end
+                t) end end end
   return aXyz
 end
 
@@ -114,17 +108,16 @@ function flatten3(aXyz,three,out)
              three[x.where][x.to] end)
 end
 
-function xyzAdd(aXyz,cells,     one,map,val)
+function xyzAdd(aXyz,cells,     new,val)
   if aXyz.show then show(cells)  end
-  one = three()
-  map = aXyz.at.map
-  for _,x in pairs(aXyz.at.map) do
-    val = cells[x.from]
+  new = three()
+  for _,t in pairs(aXyz.at.map) do
+    val = cells[t.from]
     if val ~= '?' then
       val = tonumber(val) or val
-      x.about.add(x.about, val)
-      one[x.where][x.pos] = val end end
-  aXyz.all[ #aXys.all + 1 ] = one
+      t.about.add(t.about, val)
+      new[t.where][t.pos] = val end end
+  aXyz.all[ #aXys.all + 1 ] = new
   return aXyz
 end  
 
