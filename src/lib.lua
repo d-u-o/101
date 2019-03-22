@@ -61,6 +61,10 @@ end
 cat  = table.concat
 show = function (t) print(table.concat(t,",")) end
 
+function push(t, a)
+  t[#t+1]=a
+  return a
+end
 function dump(a,sep)
   for i=1,#a do print(cat(a[i],sep or ",")) end
 end

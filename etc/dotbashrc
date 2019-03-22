@@ -37,6 +37,8 @@ pull() {
 	gitready
 	git pull
 }
+l() { $Lua  $1.lua;  }
+
 #--- tag line stuff
 _c1="\[\033[01;32m\]"
 _c2="\[\033[01;34m\]"
@@ -52,5 +54,6 @@ PROMPT_COMMAND='echo -ne "${_c6}${What}> \033]0;$(here ../..)/$(here ..)/$(here 
 
 alias ls='ls -GF'
 alias vi="`which vim` -u $Tmp/.vimrc "
+
 
 cd $Src

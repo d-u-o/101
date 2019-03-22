@@ -1,8 +1,14 @@
+Lua=luajit
 all: eg1
 
 define hi
   echo "\n### $@ ######################\n"
 endef
+
+l=$(PWD)/l  #
+
+xx:
+	 @$l dom
 
 some=cut -d, -f 4,5,8,9 | sort -t, -n -k 4  | sed 's/,/,	/g'
 
