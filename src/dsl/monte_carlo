@@ -64,20 +64,21 @@ class MonteCarlo:
             "r": {
                 "min": 1,
                 "max": 1000
-            },
+            }
         }
 
-    def generator(self, iters=1):
+    def generator(self, iters=1, verbose=False):
         for i in range(int(iters)):
             row = {key: round(uniform(item["min"], item["max"]), 2)
                    for key, item in self.attr.items()}
+            row['verbose'] = verbose
             print(row)
 
 
-def monte_carlo_main(iters, seed_val):
+def monte_carlo_main(iters, seed_val, verbose_flag):
     mc = MonteCarlo()
     seed(seed_val)
-    mc.generator(iters)
+    mc.generator(iters, verbose_flag)
 
 
 if __name__ == "__main__":
@@ -86,5 +87,8 @@ if __name__ == "__main__":
                         type=int, default=1, help='Number of repeats')
     parser.add_argument('-s', '--seed', metavar='seed',
                         type=int, default=1, help='Random number seed')
+    parser.add_argument('-v', '--verbose', metavar='verbose',
+                        type=bool, default=False, help='Verbose mode')
     args = parser.parse_args()
-    monte_carlo_main(iters=args.num_repeats, seed_val=args.seed)
+    monte_carlo_main(iters=args.num_repeats,
+                     seed_val=args.seed, verbose_flag=args.verbose)

@@ -221,7 +221,7 @@ class Model:
                 head += [">d"]
             elif col == 'ep' or col == "np":
                 head += ["<" + col]
-            elif col == 'sDR':
+            elif col == 'sDR' or col == "verbose":
                 head += ["?" + col]
             else:
                 head += ["$" + col]
