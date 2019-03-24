@@ -1,97 +1,97 @@
 -- vim: ft=lua ts=2 sw=2 sts=2 et:cindent:formatoptions+=cro
---------- --------- --------- --------- --------- ---------
+-- Duo101  copyright (c) 2018,2019 Tim Menzies, timm@ieee.org 
+-- All rights reserved, opensource.org/licenses/BSD-3-Clause
+--------- --------- --------- --------- --------- --------- ---------
 
-if not use then dofile '../use' end
+local Thing=require('use')('src/thing.lua')
+--------- --------- --------- --------- --------- --------- ---------
 
-use "src/lib.lua"
+local Num=Thing:new()
 
--- ## Example
-
---
---      n = nums{ 4,10,15,38,54,57,62,83,100,100,174,190,
---                215,225,233,250,260,270,299,300,306,
---                333,350,375,443,475,525,583,780,1000}
---      print(n.mu, n.sd) ==> 270.3, 231.946
---    
--- Inside a `num`:
-function num(txt)  
-    return {n=0, mu=0, m2=0, sd=0, id = id(), 
-            lo=10^32, hi=-1*10^32, txt=txt,
-            w=1}
+function Num:init()
+   Thing.init(self)
+   self.lo = 1/0
+   self.hi = -1/0
+   self.mu, self.m2, self.sd = 0,0,0
 end
---
--- Bulk add to a `num`:
 
-function nums(t,f,      n)
-  f=f or function(x) return x end
-  n=num()
-  for _,x in pairs(t) do numAdd(n, f(x)) end
-  return n
+function Num:sd()
+  return (self.m2/(self.n - 1 + 10^-9))^0.5  
 end
 
 -- Incremenally, add `x` to a `num`.
 -- This is [Welford's algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm)
 
-function numAdd(t,x,    d) 
-  if x == "?" then return x end
-  t.n  = t.n + 1
-  d    = x - t.mu
-  t.mu = t.mu + d/t.n
-  t.m2 = t.m2 + d*(x - t.mu)
-  if x > t.hi then t.hi = x end
-  if x < t.lo then t.lo = x end
-  if (t.n>=2) then 
-    t.sd = (t.m2/(t.n - 1 + 10^-32))^0.5 end
-  return x  
+function Num:add1(x)
+  local d = x - self.mu
+  self.mu = self.mu + d/self.n
+  self.m2 = self.m2 + d*(x - self.mu)
+  if    x > self.hi then self.hi = x end
+  if    x < self.lo then self.lo = x end
+  self.sd = self:stdev()
 end
 
--- Aside: this can be generalized to 
--- higher order moments; e.g. to calcuate
--- [skew and kurtosis](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Higher-order_statistics). 
---
--- ![](https://www.scratchapixel.com/images/upload/monte-carlo-methods/skew.png?)
---
--- Note that mean, variance, skew,
--- kurtosis may not be enough to characterize
--- real world data sets. e.g
--- see [these plots](https://raw.githubusercontent.com/txt/fss17/master/img/notnorm8.png) of CPU wait times for disk access time for numerous SQL queries from one program on one system. So whenever I can, I cluster the data and build
--- different models for different small local regions.
---
--- Remove `x` from a `num`. Note: due to
--- the approximation of this method, this
--- gets inaccurate for small `x` numbers
--- and very small sample sizes (small `n`,
--- say, less than 5)
-
-function numSub(t,x,    d) 
-  if (x == "?") then return x end
-  if (t.n == 1) then return x end
-  t.n  = t.n - 1
-  d    = x - t.mu
-  t.mu = t.mu - d/t.n
-  t.m2 = t.m2 - d*(x- t.mu)
-  if (t.n>=2) then
-    t.sd = (t.m2/(t.n - 1 + 10^-32))^0.5 end
-  return x
+function Num:sub1(x)
+  if (self.n == 1) then return x end
+  local d = x - self.mu
+  self.mu = self.mu - d/self.n
+  self.m2 = self.m2 - d*(x - self.mu)
+  self.sd = self:stdev()
 end
 
--- Normalization
-
-function numNorm(t,x,     y) 
-  return x=="?" and 0.5 or (x-t.lo) / (t.hi-t.lo + 10^-32)
+function Num:stdev()
+  return (self.n< 2) and 0 
+         or (self.m2/(self.n - 1 + 10^-9))^0.5 
 end
 
--- Likiehood
-
-function numPdf(t,x)
-  return math.exp(-1*(x - t.mu)^2/(2*t.sd^2)) *
-         1 / (t.sd * ((2*math.pi)^0.5))
+function Num:norm(x) 
+  return x==Duo.ignore and 0.5 
+         or (x-self.lo) / (self.hi-self.lo + 10^-9)
 end
 
+function Num:pdf(t,x)
+  return math.exp(-1*(x - self.mu)^2/(2*self.sd^2)) *
+         1 / (self.sd * ((2*math.pi)^0.5))
+end
 
--- Misc
+function Num:xpect(i)  
+  local n = self.n + i.n +0.0001
+  return self.n/n * self.sd+ i.n/n * i.sd
+end
 
-function numXpect(i,j,   n)  
-  n = i.n + j.n +0.0001
-  return i.n/n * i.sd+ j.n/n * j.sd
+--------- --------- --------- --------- --------- --------- ---------
+function Num.demo1(n)
+  n=Num:new():adds{ 
+    4,10,15,38,54,57,62,83,100,100,174,190,
+    215,225,233,250,260,270,299,300,306,
+  333,350,375,443,475,525,583,780,1000}
+  close(n.mu, 270.3  , 0.0001)
+  close(n.sd, 231.946, 0.0001)
+end 
+
+function Num.demo2(   m,tmp,n, datas,data,syms,kept) 
+  datas,kept = {},{}
+  rseed(1)
+  m=1000
+  for i=1,m do
+    data={}
+    datas[ i ] = data
+  for j=1,m do data[j] = rand() end end
+  n = Num:new()
+  for i=1,m do
+    map(datas[i], function (z) n:add(z) end)
+    kept[i] = n.sd
+  end
+  for i=m,1,-1 do
+    tmp = n.sd/kept[i] 
+    close(tmp, 1, 0.0001)
+    map(datas[i], function (z) n:sub(z) end)
+  end
+end 
+
+--------- --------- --------- --------- --------- --------- ---------
+if   not isMain('num') 
+then return Num
+else ok { adds = Num.demo1 }
+     ok { inc  = Num.demo2 }
 end

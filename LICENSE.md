@@ -1,7 +1,7 @@
 # LICENSE
 
-Duo101  Copyright (c) 2018, Tim Menzies
-All rights reserved, BSD 3-Clause License
+Duo101  copyright (c) 2018,2019 tim menzies
+all rights reserved, bsd 3-clause license
 
 Redistribution and use in source and binary forms, with
 or without modification, are permitted provided that

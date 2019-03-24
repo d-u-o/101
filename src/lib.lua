@@ -1,20 +1,23 @@
--- vim: ft=lua ts=2 sw=2 sts=2 et:cindent:formatoptions+=cro
---------- --------- --------- --------- --------- ---------
+-- vim : ft=lua ts=2 sw=2 sts=2 et : cindent : formatoptions+=cro
+-- Duo101  copyright (c) 2018,2019 Tim Menzies, timm@ieee.org 
+-- All rights reserved, opensource.org/licenses/BSD-3-Clause
+--------- --------- --------- --------- --------- --------- ---------
 
-if not use then dofile '../use' end
-
+require 'use' 
 use 'src/config.lua'
 
---------- --------- --------- --------- --------- --------- 
+--------- --------- --------- --------- --------- --------- ---------
 -- ## Unique ids
 
-do
-	local n= 0
-	function id() n=n+1; return n end
+do 
+  local oids = 0
+  function id() oids = oids+1; return oids end
 end
 
---------- --------- --------- --------- --------- --------- 
+--------- --------- --------- --------- --------- --------- ---------
 -- ## String Stuff
+
+function fmt(f,s) return string.format(f,s) end
 
 function split(s, sep,    t,notsep)
   t, sep = {}, sep or ","
@@ -31,11 +34,11 @@ function gsub(s,a,b,  _)
   return s
 end
 
---------- --------- --------- --------- --------- --------- 
--- $## Random Stuff
+--------- --------- --------- --------- --------- --------- ---------
+-- ##  Random Stuff
 
 do
-  local seed0     = Lean.random.seed
+  local seed0     = Duo.random.seed
   local seed      = seed0
   local modulus   = 2147483647
   local multipler = 16807
@@ -45,28 +48,27 @@ do
     return seed / modulus end
 end
 
-function another(x,t,     y)
-  y = cap(math.floor(0.5+rand()*#t),1,#t)
-  if x==y then return another(x,t) end
-  if t[y] then return t[y] end
-  return another(x,t)
-end
+-- function another(x,t,     y)
+--   y = cap(math.floor(0.5+rand()*#t),1,#t)
+--   if x==y then return another(x,t) end
+--   if t[y] then return t[y] end
+--   return another(x,t)
+-- end
 
 function any(t,    x)
   return t[ cap(math.floor(0.5+rand()*#t),1,#t) ]
 end
 
---------- --------- --------- --------- --------- --------- 
+--------- --------- --------- --------- --------- ---------  --------- 
 -- ## Table Stuff
-cat  = table.concat
-show = function (t) print(table.concat(t,",")) end
+
+function first(t)  return t[ 1] end
+function second(t) return t[ 2] end
+function last(t)   return t[#t] end
 
 function push(t, a)
   t[#t+1]=a
   return a
-end
-function dump(a,sep)
-  for i=1,#a do print(cat(a[i],sep or ",")) end
 end
 
 function appends(...)
@@ -77,9 +79,21 @@ function appends(...)
   return t
 end
 
-function first(t)  return t[ 1] end
-function second(t) return t[ 2] end
-function last(t)   return t[#t] end
+function member(x,t)
+  for _,y in pairs(t) do if y==x then return true end end
+  return false
+end
+
+function map(t1,f,    t2)
+  t2 = {}
+  for i,v in pairs(t1) do t2[i] = f(v) end
+  return t2
+end
+
+function copy(t) -- actually, deepCopy
+  if type(t) ~= "table" then return t end
+  return map(t, copy)
+end
 
 function splice(t,m,n,f,    u)
   f = f or function(x) return x end
@@ -89,6 +103,21 @@ function splice(t,m,n,f,    u)
   u = {}
   for i=m,n do u[ #u+1 ]= f(t[i]) end
   return u
+end
+
+--------- --------- --------- --------- --------- ---------  --------- 
+-- ## Table Sorting Stuff
+
+function sorted(t,f)
+  table.sort(t,f)
+  return t
+end
+
+function shuffle( t )
+  for i= 1,#t do
+    local j = i + math.floor((#t - i) * rand() + 0.5)
+    t[i],t[j] = t[j], t[i] end
+  return t
 end
 
 function ksort(k,t, reverse,  f) 
@@ -102,23 +131,6 @@ function ksort(k,t, reverse,  f)
   return t
 end  
 
-function shuffle( t )
-  for i= 1,#t do
-    local j = i + math.floor((#t - i) * rand() + 0.5)
-    t[i],t[j] = t[j], t[i] end
-  return t
-end
-
-function sorted(t,f)
-  table.sort(t,f)
-  return t
-end
-
-function member(x,t)
-  for _,y in pairs(t) do if y==x then return true end end
-  return false
-end
-
 function ordered(t,  i,keys)
   i,keys = 0,{}
   for key,_ in pairs(t) do keys[#keys+1] = key end
@@ -128,6 +140,17 @@ function ordered(t,  i,keys)
       i=i+1; return keys[i], t[keys[i]] end end 
 end
 
+--------- --------- --------- --------- --------- ---------  --------- 
+-- ## Table Printing Stuff
+
+cat  = table.concat
+show = function (t) print(table.concat(t,",")) end
+
+function dump(a,sep)
+  for i=1,#a do print(cat(a[i],sep or ",")) end
+end
+
+-- Print a nested table, one line per item, with indents
 function o(t,    indent,   formatting)
   indent = indent or 0
   for k, v in ordered(t) do
@@ -140,10 +163,24 @@ function o(t,    indent,   formatting)
         print(formatting .. tostring(v)) end end end
 end
 
-function max(x,y) return x>y and x or y end
-function min(x,y) return x<y and x or y end
-function fmt(f,s) return string.format(f,s) end
+-- Print a nested table, on one line
+function str(t,pre,   s)
+  s = "{"
+  for k, v in ordered(t)  do
+    if not (type(k)== "string" and k:match("^_")) then
+      if type(k)   == "string"   then s = s..":"..k.." " end
+      if type(v)   == "function" then s = s.."()" end
+      if type(v)   == "table"    then s = s..str(v)
+      else                          s = s..tostring(v)
+      end
+      s =  s .. " "
+    end
+  end
+  if s ~= "{" then s = s:sub(1, s:len()-1) end
+  return (pre or '') .. s.."}"
+end
 
+-- Print a 2d matrix, columns lined-up
 function cols(t,     numfmt, sfmt,noline,w,txt,sep)
   w={}
   for i,_ in pairs(t[1]) do w[i] = 0 end
@@ -169,25 +206,16 @@ function cols(t,     numfmt, sfmt,noline,w,txt,sep)
       print("") end end
 end
 
-function map(t1,f,    t2)
-  t2 = {}
-  for i,v in pairs(t1) do t2[i] = f(v) end
-  return t2
-end
-
-function copy(t)
-  if type(t) ~= "table" then return t end
-  return map(t, copy)
-end
-
---------- --------- --------- --------- --------- --------- 
+--------- --------- --------- --------- --------- ---------  --------- 
 -- ## Num Stuff
 
+function max(x,y) return x>y and x or y end
+function min(x,y) return x<y and x or y end
 function abs(x) return x<0 and -1*x or x end
 
 function close(x,y,  c)
   c=c or 0.01
-  return math.abs((x-y)/x) < c
+  return assert(math.abs((x-y)/x) < c)
 end
 
 int = function(x) return math.floor(0.5 + x) end
@@ -195,50 +223,80 @@ int = function(x) return math.floor(0.5 + x) end
 function cap(x, lo, hi)
   return min(hi, max(lo, x))
 end
---------- --------- --------- --------- --------- --------- 
--- ## Meta Stuff
 
-function main(t)
-  if type(t) == 'table' and type(t.main) == 'function' then
-       t.main(); rogues() end 
-end 
+--------- --------- --------- --------- --------- --------- ---------
+-- Object stuff
 
-function mainLib() print("lib loaded") end
+local Object={}
 
---------- --------- --------- --------- --------- ---------
--- Random stuff
+function Object:new()
+  local o =  {}
+  self.__index  = self
+  setmetatable(o, self)
+  o:init()
+  return o
+end
+
+function Object:xtras()
+  local mt      = getmetatable(self)
+  mt.__sub      = self.sub
+  mt.__add      = self.add
+  mt.__tostring = self.str
+end
+
+function Object:init()
+  self.oid = id()
+  self:xtras()
+end
+
+function Object:str()  return str(self) end
+function Object:ako(x) return getmetatable(self) == x end
+function Object:add()  assert(false,"implemented by subclass") end
+function Object:sub()  assert(false,"implemented by subclass") end
+
+--------- --------- --------- --------- --------- --------- ---------
+-- Testing stuff
+
 function rogues(    ignore)
   ignore = {jit=true, utf8=true, math=true, package=true,
             table=true, coroutine=true, bit=true, os=true,
             io=true, bit32=true, string=true, arg=true,
             debug=true, _VERSION=true, _G=true }
   for k,v in pairs( _G ) do
-   if type(v) ~= "function" and not ignore[k] then
-    if k:match("^[^A-Z]") then
-     print("-- warning, rogue local ["..k.."]") end end end
+    if type(v) ~= "function" and not ignore[k] then
+      if k:match("^[^A-Z]") then
+        fyi("-- rogue variable: ["..k.."]") end end end
 end
 
 function off(t) return t end
 
-function okReport( x)
-  x = (Lean.ok.tries-Lean.ok.fails)/ (Lean.ok.tries+10^-64)
-  return math.floor(0.5 + 100*(1- x)) end
+do
+  local tries, fails = 0,0
+  function okReport( x)
+    x = (tries-fails)/ (tries+10^-64)
+    return math.floor(0.5 + 100*(1- x)) end
 
-function ok(t,  n,score,      passed,err,s)
-  for x,f in pairs(t) do
-    Lean.ok.tries = Lean.ok.tries + 1
-    print("-- Test #" .. Lean.ok.tries ..
-          " (oops=".. okReport() .."%). Checking ".. x .."... ")
-    Lean = Lean1()
-    passed,err = pcall(f)
-    if not passed then
-      Lean.ok.fails = Lean.ok.fails + 1
-      print("-- E> Failure " .. Lean.ok.fails .. " of "
-            .. Lean.ok.tries ..": ".. err) end end
-  rogues()
+  function ok(t,  n,score,      passed,err,s)
+    for x,f in pairs(t) do
+      tries = tries + 1
+      print("-- Test #" .. tries ..
+            " (oops=".. okReport() ..
+            "%). Checking ".. x .."... ")
+      Duo = Duo0()
+      passed,err = pcall(f)
+      if not passed then
+        fails = fails + 1
+        print("-- E> Failure " .. fails .. " of " ..
+              tries ..": ".. err) end end
+    rogues()
+  end
 end
 
---------- --------- --------- --------- --------- ---------
--- End stuff
+--------- --------- --------- --------- --------- --------- ---------
+-- Misc stuff
 
-return {main=mainLib}
+function isMain(x)
+  return arg and tostring(arg[0]):match('^'.. x ..'.lua$') 
+end
+
+return isMain('lib') and rogues() or Object

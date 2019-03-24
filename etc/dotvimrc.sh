@@ -22,6 +22,7 @@ set syntax=on
 set title
 set visualbell
 set number
+set paste
 syntax enable
 set fillchars+=vert:\ 
 colorscheme torte

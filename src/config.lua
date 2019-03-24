@@ -1,8 +1,10 @@
-#!/usr/bin/env lua
--- vim: ft=lua ts=2 sw=2 sts=2 et:cindent:formatoptions+=cro
---------- --------- --------- --------- --------- ---------
+-- vim : ft=lua ts=2 sw=2 sts=2 et : cindent : formatoptions+=cro
+-- Duo101 copyright (c) 2018,2019 Tim Menzies, timm@ieee.org 
+-- All rights reserved, opensource.org/licenses/BSD-3-Clause
+--------- --------- --------- --------- --------- --------- ---------
 
-local function Lean0() return  {
+function Duo0() return  {
+  ignore   = "?",
   cohen    = 0.2,
   distance = {k=1, p=2, kernel="triangle", samples=64},
   dom      = {samples=100}, 
@@ -12,7 +14,6 @@ local function Lean0() return  {
   label    = {enough=0.5, cohen=0.3, margin=1.05},
   nb       = {m=2, k=1,enough=20},
   num      = {p=2},
-  ok       = {tries = 0, fails  =0},
   random   = {seed = 10013},
   sample   = {max=512}, 
   sk       = {cohen=0.2,
@@ -33,13 +34,4 @@ local function Lean0() return  {
                sym  = "%20s"}, 
 } end
 
-function Lean1(tmp, t, f) 
-  t,f,tmp = 0,0,Lean0()
-  if Lean then t, f = Lean.ok.tries, Lean.ok.fails end
-  tmp.ok.tries, tmp.ok.fails = t,f
-  return tmp
-end
-
-Lean = Lean1()
-
-return Lean, Lean1
+Duo = Duo0()

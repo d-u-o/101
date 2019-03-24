@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-Lua=luajit
-Ide=$(dirname $PWD) $Lua $1.lua
