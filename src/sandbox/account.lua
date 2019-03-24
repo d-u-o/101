@@ -1,23 +1,23 @@
 -- vim:ft=lua ts=2 sw=2 sts=2 et:cindent:formatoptions+=cro
 --------- --------- --------- --------- --------- ---------
 
-function str(t,pre,   result, keys, v)
-  result, keys = "{",{}
+function str(t,pre,   s, keys, v)
+  s, keys = "{",{}
   for key,_ in pairs(t) do keys[#keys+1] = key end
   table.sort(keys)
   for _, k in pairs(keys) do
     v = t[k]
-    if not (type(k) == "string" and k:match("^_")) then
-      if   type(k) == "string"   then result = result..":"..k.." " end
-      if   type(v) == "function" then result = result.."()" end
-      if   type(v) == "table"    then result = result..str(v)
-      else                           result = result..tostring(v)
+    if not (type(k)== "string" and k:match("^_")) then
+      if type(k)   == "string"   then s = s..":"..k.." " end
+      if type(v)   == "function" then s = s.."()" end
+      if type(v)   == "table"    then s = s..str(v)
+      else                          s = s..tostring(v)
       end
-      result =  result .. " "
+      s =  s .. " "
     end
   end
-  if result ~= "{" then result = result:sub(1, result:len()-1) end
-  return (pre or '') .. result.."}"
+  if s ~= "{" then s = s:sub(1, s:len()-1) end
+  return (pre or '') .. s.."}"
 end
 
 --------- --------- --------- --------- --------- ---------
@@ -46,10 +46,10 @@ function Object:init()
   self:xtras()
 end
 
-function Object:str() return str(self) end
-function Object:add() assert(false,"missing method")  end
-function Object:sub() assert(false,"missing method")  end
-
+function Object:str()  return str(self) end
+function Object:add()  assert(false,"missing method") end
+function Object:sub()  assert(false,"missing method") end
+function Object:ako(x) return getmetatable(self) == x end
 --------- --------- --------- --------- --------- ---------
 
 local Thing=Object:new()
@@ -58,8 +58,6 @@ function Thing:init()
    Object.init(self)
    self.w, self.n = 1,0
 end
-
-function Thing:nump() return false end
 
 function Thing:adds(t, f)
   f = f or function (z) return z end
@@ -90,8 +88,6 @@ function Num:init()
    self.mu, self.m2 = 0,0
 end
 
-function Num:nump() return true end
-
 function Num:sd()
   return (self.m2/(self.n - 1 + Burn.zip))^0.5  
 end
@@ -118,6 +114,7 @@ local function isMain(x)
 
 if isMain('account.lua')  then
   local m= Num:new()
+  print(m:ako(Num))
   for i=1,10^6 do
     m=  m + i
   end
