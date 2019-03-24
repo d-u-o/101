@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# vim:  ts=2 sw=2 sts=2 et:cindent:formatoptions+=cro
+# vim: ts=2 sw=2 sts=2 et:cindent:formatoptions+=cro
+
+if [ ! -d "my" ]; then echo "missing 'my'" ; else
 
 _c1="\033[01;32m"
 _c2="\033[01;34m"
@@ -23,5 +25,6 @@ alias get="git pull"
 alias put="git commit -am committing; git push; git status"
 
 mkdir -p $HOME/tmp
-
 chmod +x $PWD/my/*
+
+fi
