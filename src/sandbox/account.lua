@@ -1,4 +1,4 @@
--- vim: ft=lua ts=2 sw=2 sts=2 et:cindent:formatoptions+=cro
+-- vim:ft=lua ts=2 sw=2 sts=2 et:cindent:formatoptions+=cro
 --------- --------- --------- --------- --------- ---------
 
 function str(t,pre,   result, keys, v)
@@ -8,9 +8,10 @@ function str(t,pre,   result, keys, v)
   for _, k in pairs(keys) do
     v = t[k]
     if not (type(k) == "string" and k:match("^_")) then
-      if   type(k) == "string"  then result = result..":"..k.." " end
-      if   type(v) == "table"   then result = result..str(v)
-      else                           result = result..v
+      if   type(k) == "string"   then result = result..":"..k.." " end
+      if   type(v) == "function" then result = result.."()" end
+      if   type(v) == "table"    then result = result..str(v)
+      else                           result = result..tostring(v)
       end
       result =  result .. " "
     end
@@ -20,11 +21,8 @@ function str(t,pre,   result, keys, v)
 end
 
 --------- --------- --------- --------- --------- ---------
-function xtras(self)
-  self.__sub      = self.sub
-  self.__add      = self.add
-  self.__tostring = self.str
-end
+local oids = 0
+local function id() oids = oids+1; return oids end
 
 local Object={}
 
@@ -36,23 +34,31 @@ function Object:new()
   return o
 end
 
-local ids = 0
-function Object:init()
-  ids = ids + 1
-  self.id = ids
-  xtras(self)
+function Object:xtras()
+  local mt      = getmetatable(self)
+  mt.__sub      = self.sub
+  mt.__add      = self.add
+  mt.__tostring = self.str
 end
+
+function Object:init()
+  self.oid = id()
+  self:xtras()
+end
+
+function Object:str() return str(self) end
+function Object:add() assert(false,"missing method")  end
+function Object:sub() assert(false,"missing method")  end
 
 --------- --------- --------- --------- --------- ---------
 
 local Thing=Object:new()
-function Thing:str() return str(self,'thing') end
 
 function Thing:init()
-    Object.init(self)
-    self.w, self.n = 1,0
+   Object.init(self)
+   self.w, self.n = 1,0
 end
--- 
+
 function Thing:nump() return false end
 
 function Thing:adds(t, f)
@@ -64,11 +70,8 @@ end
 function Thing:add(x)
   if x=="?"  then return x end
   self.n = self.n + 1
-  self._p=22
   return self:add1(x) 
 end
-
-function Thing:prep(x) return x end
 
 function Thing:sub(x)
   if x=="?"  then return x end
@@ -77,8 +80,7 @@ function Thing:sub(x)
   return self:sub1(x) 
 end
 
-local Num= Thing:new()
-function Thing:str() return  str(self,'num') end
+local Num=Thing:new()
 
 function Num:init()
    Thing.init(self)
@@ -111,19 +113,13 @@ function Num:sub1(x)
 end
 
 local function isMain(x)
-   return arg and tostring(arg[0]):match('^'.. x ..'$') end
+  return arg and tostring(arg[0]):match('^'.. x ..'$') end
+--------- --------- --------- --------- --------- ---------
 
 if isMain('account.lua')  then
   local m= Num:new()
-  m.sub.a[1]=100
-  for i=1,100 do
+  for i=1,10^6 do
     m=  m + i
   end
-  --print(m)
-  --print(Num:new())
-  local j = 0
-  --for i=1,10^6 do j=j+i;Num:new() end
-  for i=1,10^6 do j=i end
-  print(j)
+  print(m)
 end
-
