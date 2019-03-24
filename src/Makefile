@@ -1,5 +1,5 @@
 Lua=luajit
-all: eg1
+all: ; my/l num
 
 define hi
   echo "\n### $@ ######################\n"
