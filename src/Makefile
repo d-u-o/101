@@ -1,3 +1,7 @@
+
+$(HOME)/tmp/a:
+	mkdir $@
+
 Lua=luajit
 all: ; my/l num
 

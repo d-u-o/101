@@ -17,14 +17,17 @@ ghbranch() {
   git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
 }
 
-PROMPT_COMMAND='echo -ne "$(hostname -s)${_c1}$(ghbranch)${_c6}: \033]0;$(here ..)/$(here .)\007";PS1="${_c1}$_c2$(here ..)/$_c3$(here .) ${_c6}\!:${_c0}\e[m "'
+PROMPT_COMMAND='echo -ne "$(hostname -s)${_c1}$(ghbranch) ${_c6}\033]0;$(here ..)/$(here .)\007";PS1="${_c1}$_c2$(here ..)/$_c3$(here .) ${_c6}\!:${_c0}\e[m "'
 
 alias ls='ls -GF'
 alias vim="`which vim` -u $PWD/my/vimrc"
 alias get="git pull"
 alias put="git commit -am committing; git push; git status"
 
-mkdir -p $HOME/tmp
 chmod +x $PWD/my/*
+
+if [ ! -d "$HOME/tmp" ]; then
+   echo "Note: your vim will need the directory $HOME/tmp"
+fi
 
 fi
