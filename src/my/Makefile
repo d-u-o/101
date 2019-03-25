@@ -10,6 +10,9 @@ Here = my#
 Tmp  = $(HOME)/tmp#
 Tests= ../tests#
 
+*nix:
+	echo 11
+
 ############################################################
 all: dirs heres luas txts mds chmods
 
