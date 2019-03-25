@@ -24,10 +24,6 @@ alias vim="`which vim` -u $PWD/my/vimrc"
 alias get="git pull"
 alias put="git commit -am committing; git push; git status"
 
-chmod +x $PWD/my/*
-
-if [ ! -d "$HOME/tmp" ]; then
-   echo "Note: your vim will need the directory $HOME/tmp"
-fi
+if [ -n "$1" ];then my/Makefile $1; fi
 
 fi
