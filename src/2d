@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+xl=$1
+x=$2
+yl=$3
+y=$4
+
+plot() { gnuplot <<EOF
+	set datafile separator ","
+	set border 3
+	set tics nomirror 
+	set terminal dumb
+	set title "x=$xl vs y=$yl" 
+	set xlabel "$xl"
+	set ylabel "$yl";
+	set nokey
+	plot '/tmp/$$' using $x:$y with dots
+EOF
+}
+
+prep() {
+	gawk '/^[0-9]/ {gsub(/\?/,0); print $0}' |
+	sort -t, -n -k $x 
+}
+
+
+cat - | prep > /tmp/$$
+echo n= `wc -l /tmp/$$`
+plot
+#head /tmp/$$

@@ -8,7 +8,7 @@ function Lean0() return  {
   domtree  = {enough=0.5},
   enough   = 100,
   fft      = {min=4},
-  label    = {enough=0.5, cohen=0.3, margin=1.05},
+  label    = {enough=0.5,cohen=0.3, margin=1.05},
   nb       = {m=2, k=1,enough=20},
   num      = {p=2},
   ok       = {tries = 0, fails  =0},
